@@ -1,6 +1,6 @@
 # Incompetent Clowns
 
-Thank you for visiting [https://incompetent-clowns.github.io/](https://incompetent-clowns.github.io/). We are a bunch of incompetent clowns, trying to become competent. We have a few projects in the works. We list them below and add details as we progress.
+Welcome to our webpage! We are a bunch of incompetent clowns, trying to become competent. We have a few projects in the works. We list them below and add details as we progress.
 
 ## Chronology
 * January 2026:
