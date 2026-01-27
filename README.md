@@ -4,7 +4,7 @@ Welcome to our webpage! We are a bunch of incompetent clowns, trying to become c
 
 ## Prototypes/links
   * WebRTC and OpenAuth based P2P call:
-     * [Web Client](https://toAtulArora.github.io/2.html): This allows you to use your Google address to authenticate and make P2P calls to people using their email addresses. Doesn't work with mobile data yet (need to add TURN servers).
+     * [Web Client](https://toAtulArora.github.io/1.html): This allows you to use your Google address to authenticate and make P2P calls to people using their email addresses. Doesn't work with mobile data yet (need to add TURN servers).
      * [Web Server](https://webrtc-signalling-backend.onrender.com/): This can sometimes take literally a minute or two to initialise (if the server hasn't been used in a while)
 
 ## Chronology
