@@ -1,1 +1,17 @@
-# incompetent-clowns.github.io
+# Incompetent Clowns
+
+Thank you for visiting [https://incompetent-clowns.github.io/](https://incompetent-clowns.github.io/). We are a bunch of incompetent clowns, trying to become competent. We have a few projects in the works. We list them below and add details as we progress.
+
+## Chronology
+* January 2026:
+  * Managed to reconstruct the project described [here](https://www.youtube.com/watch?v=YWnTYl4Br-E).
+  * Managed to get WebRTC to work on two different devices, with a nodeJS based authentication mechanism (relying on OpenAuth and Google emails); TURN servers remain to be implemented.
+  * Making progress with learning FreeCAD.
+
+## Active
+* Spineless: Supposed to be a minimal NodeJS server for testing our projects.
+* Robot-car: Supposed to be an open-design small robot car (built around an Android phone), that acts as a telepresence robot. The primary motivation being able to be "ambiently present" around loved ones. 
+
+## Wish-list
+* Lumen: TBA
+* 
