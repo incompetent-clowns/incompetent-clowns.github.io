@@ -10,8 +10,8 @@ Welcome to our webpage! We are a bunch of incompetent clowns, trying to become c
   * Streamlining the projects into a single new GitHub organisation.
  
 * *Plan* February 2026:
- * Migrate everything to the new GitHub organisation and recover previous functionality.
- * Get the ESP32 to allow the user to input a WiFi SSID and password, connect to the internet, and to the server, ready to receive instructions.
+  * Migrate everything to the new GitHub organisation and recover previous functionality.
+  * Get the ESP32 to allow the user to input a WiFi SSID and password, connect to the internet, and to the server, ready to receive instructions.
 
 
 ## Active
