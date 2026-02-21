@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>On-device EPUB translate (German → English)</title>
+  <link rel="stylesheet" href="styles.css" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header>
+    <div class="title">📕 On-device EPUB translate (German → English)</div>
+    <input type="file" id="fileInput" accept=".epub" />
+  </header>
+
+  <div class="status" id="status">Initializing...</div>
+
+  <main>
+    <div class="pane" id="leftPane">
+      <div id="viewer"></div>
+    </div>
+    <div class="pane" id="rightPane">
+      <div id="translation">
+        T: Starts translation <br/>
+        Q: Quits translation <br/>
+        ←/→: Book navigation <br/>
+        <br/>
+        <small>Known issues: 
+          <li>Sometimes an extra "the" appears in the translation;</li>
+          <li>Clicking on the ebook text, disables keyboard navigation (need to click on this right panel to restore it);</li>
+          <li> The translation isn't great but it is understandable.</li> 
+        </small>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
