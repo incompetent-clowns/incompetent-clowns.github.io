@@ -12,6 +12,7 @@ body {
   height: 100vh;
 }
 
+
 header {
   background: #111827;
   color: white;
@@ -23,6 +24,7 @@ header {
 
 .title {
   font-weight: 600;
+  color: grey;
 }
 
 header input {
