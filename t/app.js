@@ -514,7 +514,9 @@ function applyFontSize() {
 }
 
 document.getElementById("increaseFont").onclick = () => {
-  currentFontSize = Math.min(currentFontSize + 10,500);
+  console.log(currentFontSize)
+  console.log(savedFontSize)
+  currentFontSize = Math.min(+currentFontSize + 10, 500);
   console.log(currentFontSize)
   localStorage.setItem("fontSize",currentFontSize);
   applyFontSize();
