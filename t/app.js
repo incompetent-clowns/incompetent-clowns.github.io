@@ -17,7 +17,8 @@ const rightPane = document.getElementById('rightPane');
 const statusDiv = document.getElementById('status');
 const stopTranslation = document.getElementById("stopTranslation")
 const startTranslation = document.getElementById("startTranslation")
-
+const statusBar = document.getElementById("status")
+const headerStuff = document.getElementById("headerStuff")
 
 async function initTranslator() {
   stopTranslation.style.display = "none";
@@ -406,7 +407,7 @@ startTranslation.onclick = async () => {
   if(rightPane.style.display == "none"){
     rightPane.style.display = "block";
     refreshLayout()
-    
+
   }
 
   stopTranslation.style.display = "block";
@@ -433,12 +434,22 @@ document.getElementById("toggleTranslation").onclick = ()=> {
     rightPane.style.display = "none";
   }
   refreshLayout()
-}
+};
 
 document.getElementById("refreshLayout").onclick = () => {
   refreshLayout()
 };
 
+
+document.getElementById("statusBar").onclick = ()=> {
+  console.log("StatusBar clicked")
+  if (headerStuff.style.display == "none") {
+    headerStuff.style.display = "block";
+  } else {
+    headerStuff.style.display = "none";
+  }
+  refreshLayout()
+}
 
 
 
