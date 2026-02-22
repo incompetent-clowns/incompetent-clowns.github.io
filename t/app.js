@@ -179,7 +179,7 @@ fileInput.addEventListener('change', function (e) {
     // Attach keyboard navigation once iframe renders
     let keyboardAttached = false;
 
-    rendition.on("rendered", (section, contents) => {
+    rendition.on("rendered", async (section, contents) => {
       if (keyboardAttached) return;
 
       const iframe = document.querySelector("#viewer iframe");
@@ -497,6 +497,7 @@ window.addEventListener("resize", refreshLayout);
 
 function attachSwipeHandlers(contents) {
   const doc = contents.document;
+  // doc = window;
 
   let startX = 0;
   let startY = 0;
@@ -509,6 +510,16 @@ function attachSwipeHandlers(contents) {
     startY = e.touches[0].clientY;
     isSwiping = true;
   });
+
+  window.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isSwiping = true;
+  });
+
+
 
   doc.addEventListener("touchend", (e) => {
     if (!isSwiping) return;
@@ -534,6 +545,32 @@ function attachSwipeHandlers(contents) {
 
     isSwiping = false;
   });
+
+  window.addEventListener("touchend", (e) => {
+    if (!isSwiping) return;
+
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+
+    const minSwipeDistance = 50;
+
+    // Ensure horizontal swipe dominates
+    if (Math.abs(deltaX) > minSwipeDistance &&
+        Math.abs(deltaX) > Math.abs(deltaY)) {
+
+      if (deltaX < 0) {
+        rendition.next();
+      } else {
+        rendition.prev();
+      }
+    }
+
+    isSwiping = false;
+  });
+
 }
 
 
