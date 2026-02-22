@@ -237,6 +237,21 @@ fileInput.addEventListener('change', function (e) {
       }
     });
 
+    // rendition.themes.register("light", {
+    //   body: {
+    //     background: "#ffffff !important",
+    //     color: "#000000 !important"
+    //   }
+    // });
+    // "#111 !important"
+
+    // rendition.themes.register("dark", {
+    //   body: {
+    //     background: "#111111",
+    //     color: "#eeeeee"
+    //   }
+    // });
+
     // Attach keyboard navigation once iframe renders
     let keyboardAttached = false;
 
@@ -550,13 +565,16 @@ toggleTranslation.onclick = ()=> {
 toggleDark.onclick = ()=>{
   if (currentTheme === "light") {
     rendition.themes.select("dark");
+    // rendition.themes.select("default");
     currentTheme = "dark";
     toggleDark.innerText = "☾";
   } else {
     rendition.themes.select(null);  // completely clears theme
+    // rendition.themes.select("light");  // completely clears theme
     currentTheme = "light";
     toggleDark.innerText = "☀"
   }
+  refreshLayout();
   // const current = rendition.themes._current; 
   // rendition.themes.select(current === "dark" ? "default" : "dark");
 }
