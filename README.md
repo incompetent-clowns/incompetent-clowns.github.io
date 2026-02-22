@@ -31,3 +31,8 @@ Welcome to our webpage! We are a bunch of incompetent clowns, trying to become c
 * Lumen: TBA
 * Bus live location: TBA
 * Anti-surveillance Crowd-sourced Traffic Safety (ACT-safe): TBA (ambitious)
+
+## The Clowns
+
+* [Atul Singh Arora](https://atulsingharora.github.io/)
+* His imaginary friends.
