@@ -471,6 +471,9 @@ document.getElementById("prevPage").onclick = () => {
   rendition.prev();
 };
 
+document.getElementById("homePage").onclick = () => {
+  rendition.display();
+};
 
 
 function applyFontSize() {
