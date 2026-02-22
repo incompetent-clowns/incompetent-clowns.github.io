@@ -403,8 +403,16 @@ document.getElementById("decreaseFont").onclick = () => {
 
 
 startTranslation.onclick = async () => {
+  if(rightPane.style.display == "none"){
+    rightPane.style.display = "block";
+    refreshLayout()
+    
+  }
+
   stopTranslation.style.display = "block";
   startTranslation.style.display = "none";
+
+
   await triggerTranslation();
 
 };
