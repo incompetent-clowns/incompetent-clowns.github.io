@@ -9,7 +9,7 @@ let rendition;
 let quitNow;
 let file;
 let currentBookName;
-let currentFontSize;
+let currentFontSize = 100;
 quitNow=false;
 
 const fileInput = document.getElementById('fileInput');
@@ -49,9 +49,10 @@ if (savedSession) {
 }
 
 const savedFontSize = localStorage.getItem("fontSize");
-currentFontSize=100
+
 if(savedFontSize){
-  currentFontSize = savedFontsize 
+  currentFontSize = savedFontSize;
+  console.log(savedFontSize)
 }
 
 
@@ -218,6 +219,8 @@ fileInput.addEventListener('change', function (e) {
       statusDiv.innerText = "EPUB loaded. Page restored.";
     else
       statusDiv.innerText = "EPUB loaded.";
+
+    applyFontSize();
 
     // Attach keyboard navigation once iframe renders
     let keyboardAttached = false;
@@ -477,13 +480,15 @@ function applyFontSize() {
 }
 
 document.getElementById("increaseFont").onclick = () => {
-  currentFontSize += 10;
+  currentFontSize = Math.min(currentFontSize += 10,500);
+  console.log(currentFontSize)
   localStorage.setItem("fontSize",currentFontSize);
   applyFontSize();
 };
 
 document.getElementById("decreaseFont").onclick = () => {
   currentFontSize = Math.max(60, currentFontSize - 10);
+  console.log(currentFontSize)
   localStorage.setItem("fontSize",currentFontSize);
   applyFontSize();
 };
