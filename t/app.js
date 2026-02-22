@@ -8,6 +8,7 @@ let book;
 let rendition;
 let quitNow;
 let file;
+let currentBookName;
 quitNow=false;
 
 const fileInput = document.getElementById('fileInput');
@@ -154,9 +155,9 @@ async function translateText(text) {
 
 
 
-
 fileInput.addEventListener('change', function (e) {
-  const file = e.target.files[0];
+  file = e.target.files[0];
+  currentBookName = file.name;
   if (!file) return;
 
 
@@ -200,6 +201,15 @@ fileInput.addEventListener('change', function (e) {
       attachSwipeHandlers(contents);
 
     });
+
+  rendition.on("relocated", (location) => {
+    const data = {
+      bookName: currentBookName,
+      lastCfi: location.start.cfi
+    };
+
+    localStorage.setItem("epub-session", JSON.stringify(data));
+  });
     // rendition.on("rendered", (section, contents) => {
     //   attachSwipeHandlers(contents);
     // });
