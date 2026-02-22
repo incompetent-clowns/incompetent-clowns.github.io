@@ -1,6 +1,9 @@
 # Incompetent Clowns
 
 Welcome to our webpage! We are a bunch of incompetent clowns, trying to become competent. We have a few projects in the works. We detail these below and add updates as we progress.
+<p align="center">
+  <img src="icon/g1h.png" width="40%">
+</p>
 
 ## Prototypes/links
   * [Project T](https://incompetent-clowns.github.io/t): A barebones Epub file reader, with side-by-side on-device translation. Here's the [project page](t/README.md).
@@ -36,3 +39,4 @@ Welcome to our webpage! We are a bunch of incompetent clowns, trying to become c
 
 * [Atul Singh Arora](https://atulsingharora.github.io/)
 * His imaginary friends.
+
