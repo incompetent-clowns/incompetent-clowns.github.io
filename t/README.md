@@ -16,6 +16,7 @@ To run locally, on localhost:8000, use ```python -m http.server 8000```
 	* Resize panels
 	* Dark mode (the iFrame messes things up with in-built dark mode)
 	* The dropdown for translation text is wonky; needs to be fixed
+	* Allow the split to be vertical or horizontal (very useful on mobile)
 * Integrate with a local LLM (if Ollama is installed, for instance)
 * Add standard e-reader features
 	* Navigation bar
