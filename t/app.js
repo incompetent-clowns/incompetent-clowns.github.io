@@ -10,6 +10,7 @@ let quitNow;
 let file;
 let currentBookName;
 let currentFontSize = 100;
+let currentTheme = "light"
 quitNow=false;
 
 const fileInput = document.getElementById('fileInput');
@@ -21,6 +22,7 @@ const statusDiv = document.getElementById('status');
 const stopTranslation = document.getElementById("stopTranslation")
 const startTranslation = document.getElementById("startTranslation")
 const toggleTranslation = document.getElementById("toggleTranslation")
+const toggleDark = document.getElementById("toggleDark")
 // const statusBar = document.getElementById("status")
 const headerStuff = document.getElementById("headerStuff")
 const loadModel = document.getElementById("loadModel")
@@ -221,6 +223,19 @@ fileInput.addEventListener('change', function (e) {
       statusDiv.innerText = "EPUB loaded.";
 
     applyFontSize();
+
+    rendition.themes.register("dark", {
+      body: {
+        "background": "#111 !important",
+        "color": "#eee !important"
+      },
+      p: {
+        "color": "#eee !important"
+      },
+      a: {
+        "color": "#8ab4f8 !important"
+      }
+    });
 
     // Attach keyboard navigation once iframe renders
     let keyboardAttached = false;
@@ -531,6 +546,20 @@ toggleTranslation.onclick = ()=> {
   }
   refreshLayout()
 };
+
+toggleDark.onclick = ()=>{
+  if (currentTheme === "light") {
+    rendition.themes.select("dark");
+    currentTheme = "dark";
+    toggleDark.innerText = "☾";
+  } else {
+    rendition.themes.select(null);  // completely clears theme
+    currentTheme = "light";
+    toggleDark.innerText = "☀"
+  }
+  // const current = rendition.themes._current; 
+  // rendition.themes.select(current === "dark" ? "default" : "dark");
+}
 
 // document.getElementById("refreshLayout").onclick = () => {
 //   refreshLayout()
