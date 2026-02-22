@@ -2,7 +2,7 @@
 
 Welcome to our webpage! We are a bunch of incompetent clowns, trying to become competent. We have a few projects in the works. We detail these below and add updates as we progress.
 <p align="center">
-  <img src="icon/g1h.png" width="40%"></img>
+  <img src="icon/g1h.png" width="40%">
 </p>
 
 ## Prototypes/links
