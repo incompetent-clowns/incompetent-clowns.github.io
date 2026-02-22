@@ -1,6 +1,6 @@
 # Project T
 
-[Project T](https://incompetent-clowns.github.io/t) is a barebones Epub file reader, with side-by-side on-device translation. 
+[Project T](https://incompetent-clowns.github.io/t) is a barebones Epub file reader, with side-by-side on-device translation, developed by [IC](https://incompetent-clowns.github.io/). 
 
 To run locally, on localhost:8000, use ```python -m http.server 8000```
 
@@ -24,3 +24,13 @@ To run locally, on localhost:8000, use ```python -m http.server 8000```
 	* Across device sync
 	* Potentially keeping books in cache
 	* Sharing current location with other people
+
+
+## License
+Assume it is GPL for now.
+
+## Story
+
+* Wanted to learn German. Couldn't find a utility/application as basic as this. 
+* Started with ChatGPT generated code (Feb 20-23, 2026) and after a lot of debugging, it now appears to be usable.
+* Huge thanks to the community behind the ePub javascript library (for actually rendering the ePub files) and Hugging Face transformer models (for translation). 
