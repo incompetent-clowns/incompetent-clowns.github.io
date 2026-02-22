@@ -55,6 +55,7 @@ const savedFontSize = localStorage.getItem("fontSize");
 if(savedFontSize){
   currentFontSize = savedFontSize;
   console.log(savedFontSize)
+  console.log(currentFontSize)
 }
 
 
@@ -513,7 +514,7 @@ function applyFontSize() {
 }
 
 document.getElementById("increaseFont").onclick = () => {
-  currentFontSize = Math.min(currentFontSize += 10,500);
+  currentFontSize = Math.min(currentFontSize + 10,500);
   console.log(currentFontSize)
   localStorage.setItem("fontSize",currentFontSize);
   applyFontSize();
@@ -574,7 +575,15 @@ toggleDark.onclick = ()=>{
     currentTheme = "light";
     toggleDark.innerText = "☀"
   }
-  refreshLayout();
+
+  requestAnimationFrame(() => rendition.resize());
+  // const loc = rendition.currentLocation();
+  // rendition.destroy();
+  // rendition = book.renderTo("viewer", options);
+  // rendition.display(loc.start.cfi);
+  // refreshLayout();
+  // const current = rendition.currentLocation().start.cfi;
+  // rendition.display(current);
   // const current = rendition.themes._current; 
   // rendition.themes.select(current === "dark" ? "default" : "dark");
 }
