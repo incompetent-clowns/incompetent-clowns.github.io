@@ -1,6 +1,6 @@
 # Project T
 
-[Project T](https://incompetent-clowns.github.io/t) is a barebones Epub file reader, with side-by-side on-device translation, developed by [IC](https://incompetent-clowns.github.io/). 
+[Project T](https://incompetent-clowns.github.io/t) is a barebones Epub file reader, with side-by-side on-device translation, developed by [Incompetent Clowns](https://incompetent-clowns.github.io/). 
 
 To run locally, on localhost:8000, use ```python -m http.server 8000```
 
@@ -12,7 +12,10 @@ To run locally, on localhost:8000, use ```python -m http.server 8000```
 * Zero ads/bloat. 
 
 ## Wish-list
-* Resize panels
+* Basic UI features
+	* Resize panels
+	* Dark mode (the iFrame messes things up with in-built dark mode)
+	* The dropdown for translation text is wonky; needs to be fixed
 * Integrate with a local LLM (if Ollama is installed, for instance)
 * Add standard e-reader features
 	* Navigation bar
@@ -21,6 +24,7 @@ To run locally, on localhost:8000, use ```python -m http.server 8000```
 	* Allow highlighted text to be translated
 * See if there's a text to speech engine
 * Persistence
+	* Remember which language translation model was last selected
 	* Across device sync
 	* Potentially keeping books in cache
 	* Sharing current location with other people
