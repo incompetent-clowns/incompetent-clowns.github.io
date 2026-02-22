@@ -367,6 +367,10 @@ async function triggerTranslation() {
       statusDiv.innerText = "No text extracted";  
     }
     
+    startTranslation.style.display = "block";
+    stopTranslation.style.display = "none";
+
+    
   }, 300);
 }
 
@@ -440,8 +444,6 @@ startTranslation.onclick = async () => {
 
   await triggerTranslation();
 
-  startTranslation.style.display = "block";
-  stopTranslation.style.display = "none";
 
 };
 
