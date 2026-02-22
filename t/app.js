@@ -7,7 +7,7 @@ let translator;
 let book;
 let rendition;
 let quitNow;
-
+let file;
 quitNow=false;
 
 const fileInput = document.getElementById('fileInput');
@@ -152,9 +152,13 @@ async function translateText(text) {
   }
 }
 
+
+
+
 fileInput.addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
+
 
   leftPane.style.display="block";
   statusDiv.innerText = "Preparing EPUB...";
@@ -366,7 +370,7 @@ async function triggerTranslation() {
     {
       statusDiv.innerText = "No text extracted";  
     }
-    
+
     startTranslation.style.display = "block";
     stopTranslation.style.display = "none";
 
