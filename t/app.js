@@ -13,9 +13,15 @@ quitNow=false;
 const fileInput = document.getElementById('fileInput');
 const viewer = document.getElementById('viewer');
 const translationDiv = document.getElementById('translation');
+const rightPane = document.getElementById('rightPane');
 const statusDiv = document.getElementById('status');
+const stopTranslation = document.getElementById("stopTranslation")
+const startTranslation = document.getElementById("startTranslation")
+
 
 async function initTranslator() {
+  stopTranslation.style.display = "none";
+  startTranslation.style.display = "none";
   statusDiv.innerText = "Loading translation model (~80MB)...";
   try {
     translator = await pipeline(
@@ -23,6 +29,9 @@ async function initTranslator() {
       'Xenova/opus-mt-de-en'
     );
     statusDiv.innerText = "Model loaded. Upload a German EPUB file.";
+    // stopTranslation.style.display = "block";
+    startTranslation.style.display = "block";
+
   } catch (err) {
     statusDiv.innerText = "Model loading failed: " + err;
   }
@@ -157,7 +166,13 @@ fileInput.addEventListener('change', function (e) {
 
       keyboardAttached = true;
       window.document.addEventListener("keydown", handleKeyNavigation);
+
+      attachSwipeHandlers(contents);
+
     });
+    // rendition.on("rendered", (section, contents) => {
+    //   attachSwipeHandlers(contents);
+    // });
 
     // rendition.on("rendered", () => {
     // rendition.manager.container.addEventListener("keydown", (event) => {
@@ -359,6 +374,128 @@ function handleKeyNavigation(event) {
       break;
   }
 }
+
+document.getElementById("nextPage").onclick = () => {
+  rendition.next();
+};
+
+document.getElementById("prevPage").onclick = () => {
+  rendition.prev();
+};
+
+let currentFontSize = 100;
+
+function applyFontSize() {
+  rendition.themes.fontSize(currentFontSize + "%");
+  // Translation panel
+  translationDiv.style.fontSize = currentFontSize + "%";
+}
+
+document.getElementById("increaseFont").onclick = () => {
+  currentFontSize += 10;
+  applyFontSize();
+};
+
+document.getElementById("decreaseFont").onclick = () => {
+  currentFontSize = Math.max(60, currentFontSize - 10);
+  applyFontSize();
+};
+
+
+startTranslation.onclick = async () => {
+  stopTranslation.style.display = "block";
+  startTranslation.style.display = "none";
+  await triggerTranslation();
+
+};
+
+stopTranslation.onclick = () => {
+  startTranslation.style.display = "block";
+  stopTranslation.style.display = "none";
+
+  quitNow = true;
+};
+
+
+document.getElementById("toggleTranslation").onclick = ()=> {
+
+  if (rightPane.style.display === "none") {
+    rightPane.style.display = "block";
+  } else {
+    rightPane.style.display = "none";
+  }
+  refreshLayout()
+}
+
+document.getElementById("refreshLayout").onclick = () => {
+  refreshLayout()
+};
+
+
+
+
+function refreshLayout() {
+  setTimeout(() => {
+    rendition.resize();
+  }, 50);
+}
+window.addEventListener("resize", refreshLayout);
+
+
+
+function attachSwipeHandlers(contents) {
+  const doc = contents.document;
+
+  let startX = 0;
+  let startY = 0;
+  let isSwiping = false;
+
+  doc.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) return;
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    isSwiping = true;
+  });
+
+  doc.addEventListener("touchend", (e) => {
+    if (!isSwiping) return;
+
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+
+    const minSwipeDistance = 50;
+
+    // Ensure horizontal swipe dominates
+    if (Math.abs(deltaX) > minSwipeDistance &&
+        Math.abs(deltaX) > Math.abs(deltaY)) {
+
+      if (deltaX < 0) {
+        rendition.next();
+      } else {
+        rendition.prev();
+      }
+    }
+
+    isSwiping = false;
+  });
+}
+
+
+
+    // if (event.key.toLowerCase() === "t") {
+    //   // event.preventDefault();
+      
+    // }
+
+    // if (event.key.toLowerCase() === "q") {
+    //   // event.preventDefault();
+    //   quitNow = true;
+    // }
+
 // document.addEventListener("keydown", (event) => {
 //   // Ignore key presses if user is typing in a text field
 //   const activeTag = document.activeElement.tagName.toLowerCase();

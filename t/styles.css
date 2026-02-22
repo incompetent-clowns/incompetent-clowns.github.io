@@ -61,10 +61,91 @@ main {
 #viewer iframe {
   width: 100% !important;
   height: 100% !important;
+  touch-action: pan-y;
 }
+/*#viewer iframe {
+  touch-action: pan-y;
+}
+*/
 
 #viewer, #translation {
-  max-width: 700px;
-  margin: auto;
+  /*max-width: 700px;*/
+  /*max-width: none;*/
+  margin: 0;
+  /*margin: auto;*/
   line-height: 1.6;
 }
+
+/* Make room for footer */
+main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding-bottom: 60px; /* space for footer */
+}
+
+/* Bottom control bar */
+.controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+
+.controls-inner {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn:hover {
+  background: #e5e7eb;
+}
+
+.btn.primary {
+  background: #111827;
+  color: white;
+  border: none;
+}
+
+.btn.primary:hover {
+  opacity: 0.9;
+}
+
+.btn.danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+}
+
+.btn.danger:hover {
+  opacity: 0.9;
+}
+
+background: rgba(255,255,255,0.85);
+backdrop-filter: blur(10px);
