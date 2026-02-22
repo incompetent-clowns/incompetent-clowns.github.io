@@ -440,6 +440,9 @@ startTranslation.onclick = async () => {
 
   await triggerTranslation();
 
+  startTranslation.style.display = "block";
+  stopTranslation.style.display = "none";
+
 };
 
 stopTranslation.onclick = () => {
