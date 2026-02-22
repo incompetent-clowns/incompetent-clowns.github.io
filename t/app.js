@@ -17,19 +17,39 @@ const rightPane = document.getElementById('rightPane');
 const statusDiv = document.getElementById('status');
 const stopTranslation = document.getElementById("stopTranslation")
 const startTranslation = document.getElementById("startTranslation")
+const toggleTranslation = document.getElementById("toggleTranslation")
 // const statusBar = document.getElementById("status")
 const headerStuff = document.getElementById("headerStuff")
+const loadModel = document.getElementById("loadModel")
+const trSelect = document.getElementById("tr-select")
+
+
+loadModel.onclick = async () => {
+  console.log("changing engine")
+  console.log(trSelect.value)
+
+  await initTranslator();
+}
 
 async function initTranslator() {
   stopTranslation.style.display = "none";
   startTranslation.style.display = "none";
-  statusDiv.innerText = "Loading translation model (~80MB)...";
+  statusDiv.innerText = "Loading translation model (~80MB)...(can take a while the first time)";
   try {
+    let trValue
+
+    trValue = (trSelect.value=="") ? 'Xenova/opus-mt-de-en': trSelect.value
+
     translator = await pipeline(
       'translation',
-      'Xenova/opus-mt-de-en'
+      trValue
     );
-    statusDiv.innerText = "Model loaded. Upload a German EPUB file.";
+
+    // translator = await pipeline(
+    //   'translation',
+    //   'Xenova/opus-mt-de-en'
+    // );
+    statusDiv.innerText = "Model loaded: " + trValue; //"Model loaded. Upload a German EPUB file.";
     // stopTranslation.style.display = "block";
     startTranslation.style.display = "block";
 
@@ -37,6 +57,8 @@ async function initTranslator() {
     statusDiv.innerText = "Model loading failed: " + err;
   }
 }
+
+
 
 // async function translateText(text) {
 //   if (!translator) return;
@@ -407,7 +429,6 @@ startTranslation.onclick = async () => {
   if(rightPane.style.display == "none"){
     rightPane.style.display = "block";
     refreshLayout()
-
   }
 
   stopTranslation.style.display = "block";
@@ -426,30 +447,34 @@ stopTranslation.onclick = () => {
 };
 
 
-document.getElementById("toggleTranslation").onclick = ()=> {
+toggleTranslation.onclick = ()=> {
   console.log("toggleTranslation");
-  if (rightPane.style.display === "none") {
+  if (rightPane.style.display == "none") {
     rightPane.style.display = "block";
+    toggleTranslation.innerText = "⟩"
   } else {
     rightPane.style.display = "none";
+    toggleTranslation.innerText = "⟨"
   }
   refreshLayout()
 };
 
-document.getElementById("refreshLayout").onclick = () => {
-  refreshLayout()
-};
+// document.getElementById("refreshLayout").onclick = () => {
+//   refreshLayout()
+// };
 
 
 document.getElementById("toggleStatus").onclick = () => {
   console.log("toggleStatus clicked");
 
-  // if (headerStuff.style.display == "none") {
-  //   headerStuff.style.display = "block";
-  // } else {
-  //   headerStuff.style.display = "none";
-  // }
-  // refreshLayout();
+  if (headerStuff.style.display == "none") {
+    headerStuff.style.display = "block";
+    statusDiv.style.display="block";
+  } else {
+    headerStuff.style.display = "none";
+    statusDiv.style.display="none";
+  }
+  refreshLayout();
 };
 
 
@@ -504,6 +529,42 @@ function attachSwipeHandlers(contents) {
 }
 
 
+
+
+// const divider = document.getElementById("divider");
+// const main = document.querySelector("main");
+
+// let isDragging = false;
+
+// divider.addEventListener("mousedown", () => {
+//   isDragging = true;
+//   document.body.style.cursor = "col-resize";
+// });
+
+// document.addEventListener("mouseup", () => {
+//   isDragging = false;
+//   document.body.style.cursor = "default";
+// });
+
+// document.addEventListener("mousemove", (e) => {
+//   if (!isDragging) return;
+
+//   const mainRect = main.getBoundingClientRect();
+//   const offset = e.clientX - mainRect.left;
+//   const totalWidth = mainRect.width;
+
+//   const leftPercent = (offset / totalWidth) * 100;
+//   const rightPercent = 100 - leftPercent;
+
+//   if (leftPercent > 10 && rightPercent > 10) {
+//     main.style.gridTemplateColumns =
+//       `${leftPercent}% 6px ${rightPercent}%`;
+//   }
+
+//   // Fix EPUB layout after resizing
+//   // rendition.resize();
+//   refreshLayout();
+// });
 
     // if (event.key.toLowerCase() === "t") {
     //   // event.preventDefault();

@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>On-device EPUB translate (German → English)</title>
   <link rel="stylesheet" href="styles.css" />
-  
+  <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+
   <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
   <script type="module" src="app.js"></script>
   <script type="module" src="app.js"></script>
 </head>
@@ -29,8 +32,8 @@
     </div>
 
     <div class="group">
-      <button id="toggleTranslation" class="btn">Toggle</button>
-      <button id="toggleStatus" class="btn">Status</button>
+      <button id="toggleTranslation" class="btn">⟩</button>
+      <button id="toggleStatus" class="btn">⛶</button>
       <!-- <button id="refreshLayout" class="btn">Refresh</button> -->
       
       <!-- <button id="hideTranslation" class="btn danger">Hide</button> -->
@@ -40,32 +43,61 @@
 </footer>
 
 <body>
-  <header> 
-   <!-- id="headerStuff"> -->
-    <div id="headerStuff">
-      <div class="title">📕 On-device EPUB translate (German → English)</div>
+  <header id="headerStuff">
+    <!-- <div id="headerStuff"> -->
+      <div class="title">📕 Project T </div>
+      
+      <!-- <input id="tr-select" placeholder="(German → English)" /> -->
+      <!-- <label for="tr-select">(German → English)</label> -->
+      <input list="topics" id="tr-select" name="tr-select" placeholder="(German → English)"> 
+       <!-- value="Xenova/opus-mt-de-en"> -->
+
+      <datalist id="topics">
+        <option value="Xenova/opus-mt-de-en">
+        <option value="Xenova/opus-mt-fr-en">
+      </datalist>
+
+      <button id="loadModel" class="btn">Load</button> 
+      <!-- <small> On-device EPUB translate (German → English)</small> -->
       <input type="file" id="fileInput" accept=".epub" />
-    </div>
+    <!-- </div> -->
   </header>
 
+  <!--   <script>
+    const tr-select = new TomSelect("#tr-select", {
+      create: true,          // Allow user to create new items
+      persist: false,        // Don't automatically add created items permanently
+      maxItems: 1,           // Single selection
+      options: [
+        { value: "Xenova/opus-mt-de-en", text: "German → English" },
+        { value: "Xenova/opus-mt-fr-en", text: "French → English" }
+      ]
+    });
+
+  </script>
+  -->
   <div class="status" id="status">Initializing... </div>
 
   <main>
     <div class="pane" id="leftPane">
       <div id="viewer"></div>
     </div>
+    
+    <!-- <div id="divider"></div> -->
+
+
     <div class="pane" id="rightPane">
       <div id="translation">
         T: Starts translation <br/>
         Q: Quits translation <br/>
         ←/→: Book navigation <br/>
         <br/>
-        <small>Known issues: 
+<!--         <small>Known issues: 
           <li>Sometimes an extra "the" appears in the translation;</li>
           <li>Clicking on the ebook text, disables keyboard navigation (need to click on this right panel to restore it);</li>
           <li> The translation isn't great but it is understandable.</li> 
         </small>
-      </div>
+ -->      </div>
     </div>
   </main>
 </body>

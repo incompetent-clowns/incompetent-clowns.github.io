@@ -37,9 +37,27 @@ header input {
 }
 
 main {
+  display: grid;
+  grid-template-columns: 1fr 6px 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+/*main {
   display: flex;
   flex: 1;
   overflow: hidden;
+}
+*/
+#divider {
+  width: 6px;
+  cursor: col-resize;
+  background: #e5e7eb;
+  transition: background 0.2s ease;
+}
+
+#divider:hover {
+  background: #9ca3af;
 }
 
 .pane {
@@ -63,6 +81,8 @@ main {
   height: 100% !important;
   touch-action: pan-y;
 }
+
+
 /*#viewer iframe {
   touch-action: pan-y;
 }
