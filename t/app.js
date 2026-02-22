@@ -14,6 +14,7 @@ const fileInput = document.getElementById('fileInput');
 const viewer = document.getElementById('viewer');
 const translationDiv = document.getElementById('translation');
 const rightPane = document.getElementById('rightPane');
+const leftPane = document.getElementById('leftPane');
 const statusDiv = document.getElementById('status');
 const stopTranslation = document.getElementById("stopTranslation")
 const startTranslation = document.getElementById("startTranslation")
@@ -23,6 +24,7 @@ const headerStuff = document.getElementById("headerStuff")
 const loadModel = document.getElementById("loadModel")
 const trSelect = document.getElementById("tr-select")
 
+leftPane.style.display="none"
 
 loadModel.onclick = async () => {
   console.log("changing engine")
@@ -154,6 +156,7 @@ fileInput.addEventListener('change', function (e) {
   const file = e.target.files[0];
   if (!file) return;
 
+  leftPane.style.display="block";
   statusDiv.innerText = "Preparing EPUB...";
   book = ePub(file);
 
