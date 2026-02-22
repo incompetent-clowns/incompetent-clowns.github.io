@@ -27,6 +27,27 @@ const trSelect = document.getElementById("tr-select")
 
 leftPane.style.display="none"
 
+// const savedSession = localStorage.getItem("epub-session");
+
+
+// if (savedSession) {
+//   const { bookName, lastCfi } = JSON.parse(savedSession);
+
+//   console.log("Previously opened:", bookName);
+//   window.savedCfi = lastCfi;  // temporarily store
+// }
+
+const savedSession = localStorage.getItem("epub-session");
+let savedBook = null;
+let savedCfi = null;
+
+if (savedSession) {
+  const parsed = JSON.parse(savedSession);
+  savedBook = parsed.bookName;
+  savedCfi = parsed.lastCfi;
+}
+
+
 loadModel.onclick = async () => {
   console.log("changing engine")
   console.log(trSelect.value)
@@ -176,7 +197,14 @@ fileInput.addEventListener('change', function (e) {
 
     await book.ready;
     await book.locations.generate(1600);
-    return rendition.display();
+
+    if (file.name === savedBook && savedCfi) {
+        return rendition.display(savedCfi);
+      } else {
+        return rendition.display();
+      }
+
+    // return rendition.display();
 
   }).then(() => {
     statusDiv.innerText = "EPUB loaded.";
@@ -202,14 +230,17 @@ fileInput.addEventListener('change', function (e) {
 
     });
 
-  rendition.on("relocated", (location) => {
-    const data = {
-      bookName: currentBookName,
-      lastCfi: location.start.cfi
-    };
+    rendition.on("relocated", (location) => {
+      const data = {
+        bookName: currentBookName,
+        lastCfi: location.start.cfi
+      };
 
-    localStorage.setItem("epub-session", JSON.stringify(data));
-  });
+      localStorage.setItem("epub-session", JSON.stringify(data));
+    });
+
+
+
     // rendition.on("rendered", (section, contents) => {
     //   attachSwipeHandlers(contents);
     // });
