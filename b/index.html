@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Testing Websockets</title>
+</head>
+
+<body>
+    <h3>Incoming Messages</h3>
+    <textarea id="incoming" rows="10" cols="50" readonly></textarea>
+
+    <h3>Send Message</h3>
+    <textarea id="outgoing" rows="10" cols="50" readonly></textarea>
+    <!-- <input type="text" id="outgoing" /> -->
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        // Placeholder function for sending messages
+        function sendMessage() {
+            const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
+
+            // ws.send("id:")
+            ws.onmessage = function (event) {
+                document.getElementById('incoming').value = event.data;
+            };
+            //   const input = document.getElementById('outgoing');
+            //   const message = input.value;
+
+            // For now, just echo it to the incoming box
+            //   const incomingBox = document.getElementById('incoming');
+            //   incomingBox.value += message + "\n";
+
+            //   input.value = '';
+        }
+    </script>
+</body>
+
+</html>
