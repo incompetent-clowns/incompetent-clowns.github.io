@@ -6,11 +6,205 @@
 </head>
 
 <body>
+    <h3>Register Device (need to do this only once)</h3>
+
+    <button id="regen">Generate New Keypair</button>
+
+    <p><b>Status:</b></p> <span id="status">Initialising...</span>
+    <!-- <script>
+        statusEl = Document.getElementById("status")
+    </script> -->
+
+    <h4>Public Key</h4>
+    <textarea id="publickey" rows="6" cols="80" readonly></textarea>
+
+    <script>
+        const DB_NAME = "cryptoDB";
+        const STORE_NAME = "keys";
+
+        //opening IndexDB
+        function openDB() {
+            // Promise ((resolve, reject) => { 
+            // some async task here; when completed successfully, resolve(val1) returns val1
+            // when failed, reject(val2) returns val2}
+
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+
+                req.onupgradeneeded = () => {
+                    req.result.createObjectStore(STORE_NAME);
+                }
+
+                req.onsuccess = () => resolve(req.result);
+                // () => resolve(val) is basically
+                // function () { resolve(val) } something basically defines a function with no arguments
+                // In this context, req.onsucess being defined to be a function
+                // that gets invoked if the req succeeds
+                req.onerror = () => reject(req.error);
+            })
+        }
+
+        // Save keys
+        async function saveKeys(db, keyPair) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, "readwrite");
+                const store = tx.objectStore(STORE_NAME);
+
+                store.put(keyPair.privateKey, "private");
+                store.put(keyPair.publicKey, "public");
+
+                tx.oncomplete = resolve;
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        // Load keys
+        async function loadKeys(db) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, "readonly");
+                const store = tx.objectStore(STORE_NAME);
+
+                const privReq = store.get("private");
+                const pubReq = store.get("public");
+
+                tx.oncomplete = () => {
+                    if (privReq.result && pubReq.result) {
+                        resolve({
+                            privateKey: privReq.result,
+                            publicKey: pubReq.result
+                        });
+                    }
+                    else {
+                        resolve(null);
+                    }
+                };
+
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+
+        //Generate keypair
+        async function generateKeyPair() {
+            return crypto.subtle.generateKey(
+                {
+                    name: "ECDSA",
+                    namedCurve: "P-256"
+                },
+                false, // non-extractable secret key
+                ["sign", "verify"]
+            );
+        }
+
+        // Export public key to base64
+        async function exportPublicKey(pubKey) {
+            const spki = await crypto.subtle.exportKey("spki", pubKey);
+            return btoa(String.fromCharCode(...new Uint8Array(spki))); //TODO: understand what this is doing 
+        }
+
+        // Initialise
+        async function init(forceNew = false) {
+            // const statusEl = document.getElementById("status");
+            const statusEl = document.getElementById("status");
+            const pubEl = document.getElementById("publickey");
+
+            // statusEl.textContent = "Opening DB";
+            statusEl.textContent = "Opening database...";
+            const db = await openDB();
+
+            let keyPair = null;
+
+            if (!forceNew) {
+                statusEl.textContent = "Checking for existing keys...";
+                keyPair = await loadKeys(db);
+            }
+
+            if (!keyPair) {
+                statusEl.textContent = "Generating new keypair...";
+                keyPair = await generateKeyPair();
+
+                await saveKeys(db, keyPair);
+                statusEl.textContent = "New keypair generated and stored.";
+            }
+            else {
+                statusEl.textContent = "Loaded existing keypair."
+            }
+
+            //Show public key
+            const pub = await exportPublicKey(keyPair.publicKey);
+            pubEl.value = pub;
+        }
+
+        //Button
+        document.getElementById("regen").addEventListener("click", () => {
+            init(true);
+        })
+
+        //Run on load
+        init();
+    </script>
+
+
+
+
+    <!-- <script>
+        const keyPair = await crypto.subtle.generateKey(
+            {
+                name: "ECDSA",
+                namedCurve: "P-256",
+            },
+            false, // 👈 IMPORTANT: non-extractable private key
+            ["sign", "verify"]
+        );
+
+        const db = await indexedDB.open("keysDB", 1);
+
+        db.onupgradeneeded = () => {
+            db.result.createObjectStore("keys");
+        };
+
+        db.onsuccess = () => {
+            const tx = db.result.transaction("keys", "readwrite");
+            const store = tx.objectStore("keys");
+            store.put(keyPair.privateKey, "private");
+            store.put(keyPair.publicKey, "public");
+        };
+    </script> -->
+
+    <!-- You can either generate a fresh pair of public/secret key pair.<br />
+    The system should remember the last pair you generated<br />
+
+    <input text="text" id="pk" placeholder="public key" />
+    <input text="text" id="sk" placeholder="secret key" /> -->
+
+    <!-- <textarea id="myText" placeholder="Type something..."></textarea> -->
+
+    <!-- <script>
+        const pk = document.getElementById("pk");
+
+        // Load saved value on page load
+        const saved = localStorage.getItem("pkVal");
+        if (saved) {
+            pk.value = saved;
+        }
+
+        // Save whenever user types
+        pk.addEventListener("input", () => {
+            localStorage.setItem("pkVal", pk.value);
+        });
+    </script> -->
+
+
+    <h3>Connect to server</h3>
+    Assuming you have registered the device once,
+    you should be able to connect to the server.
+
+
     <h3>Incoming Messages</h3>
     <textarea id="incoming" rows="10" cols="50" readonly></textarea>
 
     <h3>Send Message</h3>
-    <textarea id="outgoing" rows="10" cols="50" readonly></textarea>
+    <textarea id="outgoing" rows="10" cols="50"></textarea>
     <!-- <input type="text" id="outgoing" /> -->
     <button onclick="sendMessage()">Send</button>
 
