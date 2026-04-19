@@ -16,11 +16,12 @@
     </script> -->
 
     <h4>Public Key</h4>
-    <textarea id="publickey" rows="6" cols="80" readonly></textarea>
+    <textarea id="publickey" rows="6" cols="60" readonly></textarea>
 
     <script>
         const DB_NAME = "cryptoDB";
         const STORE_NAME = "keys";
+        let keyPair = null;
 
         //opening IndexDB
         function openDB() {
@@ -112,7 +113,8 @@
             statusEl.textContent = "Opening database...";
             const db = await openDB();
 
-            let keyPair = null;
+            // let keyPair = null;
+            keyPair = null;
 
             if (!forceNew) {
                 statusEl.textContent = "Checking for existing keys...";
@@ -142,10 +144,164 @@
 
         //Run on load
         init();
+
     </script>
 
+    <h4>Testing Message Signing</h4>
+    <textarea id="messageToSign" rows="6" cols="60" placeholder="Message to sign"></textarea> <br />
+    <textarea id="signature" rows="6" cols="60" placeholder="Signature appears here"></textarea> <br />
+    <button id="signNow">Sign message</button>
+
+    <script>
+        function toBase64(buffer) {
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        }
+
+        function signMessage(message, keyPair) {
+            return new Promise((resolve, reject) => {
+
+                const encoder = new TextEncoder();
+                const data = encoder.encode(message);
+
+                crypto.subtle.sign(
+                    {
+                        name: "ECDSA",
+                        hash: "SHA-256"
+                    },
+                    keyPair.privateKey,
+                    data
+                ).then(signatureBuffer => {
+                    // console.log("glaba");
+                    resolve(toBase64(signatureBuffer));
+                });
+
+                // reject("failed");
+            });
+        }
+
+    </script>
+
+    <script>
+        messageToSignEl = document.getElementById("messageToSign");
+        signatureEl = document.getElementById("signature");
+        signNowEl = document.getElementById("signNow");
+
+        // signNowEl.addEventListener("click", () => {
+        //     crypto.subtle.sign(
+        //         {
+        //             name: "ECDSA",
+        //             hash: "SHA-256"
+        //         },
+        //         keyPair.privateKey,
+        //         data
+        //     ).then(signatureBuffer => {
+        //         signatureEl.textContent = signatureBuffer;
+        //     });
+        // });
+        // () => {
+        //     signatureEl.textContent = "glab";
+        // });
+
+        // signNowEl.addEventListener("click", async () => {
+        //     message = messageToSignEl.textContent;
+        //     const encoder = new TextEncoder();
+        //     const data = encoder.encode(message);
+
+        //     const signatureBuffer = await crypto.subtle.sign(
+        //         {
+        //             name: "ECDSA",
+        //             hash: "SHA-256"
+        //         },
+        //         keyPair.privateKey,
+        //         data
+        //     ) //called buffer because it is not formatted properly
+        //     signatureEl.textContent = toBase64(signatureBuffer); //need to format before assigning
+        // });
+
+        signNowEl.addEventListener("click", () => {
+            signMessage(messageToSignEl.textContent, keyPair).then(
+                res => { signatureEl.textContent = res }
+            );
+            // const encoder = new TextEncoder();
+            // const data = encoder.encode(message);
+
+            // const signatureBuffer = await crypto.subtle.sign(
+            //     {
+            //         name: "ECDSA",
+            //         hash: "SHA-256"
+            //     },
+            //     keyPair.privateKey,
+            //     data
+            // ) //called buffer because it is not formatted properly
+            // signatureEl.textContent = toBase64(signatureBuffer); //need to format before assigning
+        });
 
 
+
+    </script>
+
+    <h4>Register the device</h4>
+    <p>The page will remember your settings so you need only input them once.</p>
+    <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default https://mac.taild17908.ts.net/)" default="mac...">https://mac.taild17908.ts.net/</textarea> <br />
+    <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br />
+    <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use eyes1)">eyes1</textarea> <br />
+    <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use eyes)">eyes</textarea> <br />
+    <button id="registerNow">Register Now</button><br/><br/>
+    <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
+
+
+    <script>
+        serverURLEl = document.getElementById("serverURL");
+        projectNameEl = document.getElementById("projectName");
+        deviceIdEl = document.getElementById("deviceId");
+        registerNowEl = document.getElementById("registerNow");
+        deviceTypeEl = document.getElementById("deviceType");
+
+        savedserverURL = localStorage.getItem("serverURL");
+        savedprojectName = localStorage.getItem("projectName");
+        saveddeviceId = localStorage.getItem("deviceId");
+        saveddeviceType = localStorage.getItem("deviceType");
+        
+        if (savedserverURL){
+            serverURLEl.textContent = savedserverURL;
+        }
+        if (savedprojectName){
+            projectNameEl.textContent = savedprojectName;
+        }
+        if (saveddeviceId){
+            deviceIdEl.textContent = saveddeviceId;
+        }
+        if (saveddeviceType){
+            deviceTypeEl.textContent = saveddeviceType;
+        }
+
+
+        registerNowEl.addEventListener("click", () => {
+            localStorage.setItem("serverURL",serverURLEl.value); //careful, if you use textContent, this will be stale
+            localStorage.setItem("projectName",projectNameEl.value);
+            localStorage.setItem("deviceId",deviceIdEl.value);
+            localStorage.setItem("deviceType",deviceTypeEl.value);
+        });
+    </script>    
+    <!-- <script>
+        serverURLEl = document.getElementById("serverURL");
+        projectNameEl = document.getElementById("projectName");
+        deviceIdEl = document.getElementById("deviceId");
+        registerNowEl = document.getElementById("registerNow");
+
+        savedServerURL = localStorage.getItem("serverURL");
+        if (savedServerURL){
+            serverURLEl.textContent = savedServerURL;
+        }
+
+        // serverURLEl.textContent = "glib";
+
+        registerNowEl.addEventListener("click", () => {
+            console.log(serverURLEl.textContent);
+            // serverURLEl.textContent="glaba";
+            // localStorage.setItem("serverURL",serverURLEl.textContent);
+        })
+    </script> -->
 
     <!-- <script>
         const keyPair = await crypto.subtle.generateKey(
@@ -211,12 +367,15 @@
     <script>
         // Placeholder function for sending messages
         function sendMessage() {
-            const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
+            // https://mac.taild17908.ts.net/
+            const ws = new WebSocket('wss://mac.taild17908.ts.net/'); //+ location.host);
+            // const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
 
             // ws.send("id:")
             ws.onmessage = function (event) {
-                document.getElementById('incoming').value = event.data;
+                document.getElementById('incoming').value = document.getElementById('incoming').value + "\n" + event.data;
             };
+            
             //   const input = document.getElementById('outgoing');
             //   const message = input.value;
 
