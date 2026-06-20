@@ -147,7 +147,7 @@
 
     </script>
 
-    <h4>Testing Message Signing</h4>
+    <h4>Testing Message Signing (local-only)</h4>
     <textarea id="messageToSign" rows="6" cols="60" placeholder="Message to sign"></textarea> <br />
     <textarea id="signature" rows="6" cols="60" placeholder="Signature appears here"></textarea> <br />
     <button id="signNow">Sign message</button>
@@ -256,6 +256,7 @@
         deviceIdEl = document.getElementById("deviceId");
         registerNowEl = document.getElementById("registerNow");
         deviceTypeEl = document.getElementById("deviceType");
+        regStatusEl = document.getElementById("regStatus");
 
         savedserverURL = localStorage.getItem("serverURL");
         savedprojectName = localStorage.getItem("projectName");
@@ -281,6 +282,9 @@
             localStorage.setItem("projectName",projectNameEl.value);
             localStorage.setItem("deviceId",deviceIdEl.value);
             localStorage.setItem("deviceType",deviceTypeEl.value);
+
+            regStatusEl.value="Gaba";
+            regStatusEl.value="gleeba";
         });
     </script>    
     <!-- <script>
