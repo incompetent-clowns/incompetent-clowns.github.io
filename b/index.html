@@ -179,6 +179,22 @@
             });
         }
 
+        async function a_signMessage(message, keyPair) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+
+            const signatureBuffer = await crypto.subtle.sign(
+                {
+                    name: "ECDSA",
+                    hash: "SHA-256"
+                },
+                keyPair.privateKey,
+                data
+            );
+
+            return toBase64(signatureBuffer);
+        }        
+
     </script>
 
     <script>
@@ -286,7 +302,7 @@
         }
 
 
-        authenticateNowEl.addEventListener("click", () => {
+        authenticateNowEl.addEventListener("click", async (event) => {
             localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
             // localStorage.setItem("projectName", projectNameEl.value);
             localStorage.setItem("deviceId", deviceIdEl.value);
@@ -306,9 +322,10 @@
                 // signMessage(messageToSignEl.textContent, keyPair).then(
                 //     res => { signatureEl.textContent = res }
                 // );
-                let signature = null
+                // let signature = null
 
-                signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
+                // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
+                const signature = await signMessage(challenge, keyPair);
 
                 response = {
                     type: "device",
