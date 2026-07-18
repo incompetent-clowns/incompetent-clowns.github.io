@@ -302,7 +302,12 @@
         }
 
 
+        // authenticateNowEl.addEventListener("click", async (event) => {
+        //     const result = await a_signMessage(0,0);
+        // });
+
         authenticateNowEl.addEventListener("click", async (event) => {
+
             localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
             // localStorage.setItem("projectName", projectNameEl.value);
             localStorage.setItem("deviceId", deviceIdEl.value);
@@ -310,7 +315,7 @@
 
             ws = new WebSocket(serverURLEl.value); //('wss://mac.taild17908.ts.net/'); //+ location.host);
 
-            ws.onmessage = function (msg) {
+            ws.onmessage = async function (msg) {
                 // let _ = authStatusEl.value 
                 // = authStatusEl.value
                 authStatusEl.value = authStatusEl.value + "\n" + msg.data;
@@ -325,7 +330,8 @@
                 // let signature = null
 
                 // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
-                const signature = await signMessage(challenge, keyPair);
+                authStatusEl.value = authStatusEl.value + "\nThis should be private:" + JSON.stringify(keyPair.privateKey)
+                const signature = await a_signMessage(inDat.challenge, keyPair);
 
                 response = {
                     type: "device",
