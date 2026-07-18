@@ -300,15 +300,16 @@
                 authStatusEl.value = authStatusEl.value + "\n" + msg.data;
                 
                 // loadKeys(dB)
-                inDat = JSON.parse(msg);
+                inDat = JSON.parse(msg.data);
                 // const pubEl = document.getElementById("publickey");
 
-                // response = {
-                //     signature: signMessage(inDat.challenge,pubEl.value),
-                //     type: "device",
-                //     deviceId: deviceIdEl.value,
-                //     deviceType: deviceTypeEl.value
-                // };
+                response = {
+                    signature: "hello", //signMessage(inDat.challenge,pubEl.value),
+                    type: "device",
+                    deviceId: deviceIdEl.value,
+                    deviceType: deviceTypeEl.value
+                };
+
                 // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
                 // ws.send(JSON.stringify(response));
                 // response = {
@@ -317,8 +318,9 @@
                 //     deviceId: deviceIdEl.value,
                 //     deviceType: deviceTypeEl.value
                 // };
+
                 authStatusEl.value = authStatusEl.value + "\nSending this response:" 
-                //+ JSON.stringify(response); 
+                + JSON.stringify(response); 
                 ws.send(JSON.stringify(response));
 
             };
