@@ -294,8 +294,15 @@
 
             ws = new WebSocket(serverURLEl.value); //('wss://mac.taild17908.ts.net/'); //+ location.host);
 
-            ws.onmessage = function (event) {
-                authStatusEl.value = authStatusEl.value + "\n" + event.data;
+            ws.onmessage = function (msg) {
+                authStatusEl.value = authStatusEl.value + "\n" + msg.data;
+                inDat = JSON.parse(msg);
+                response = {
+                    signature: signMessage(inDat.challenge,keyPair),
+                    type: "device",
+                    deviceId:                     
+                };
+                ws.sendMessage(JSON.stringify(response));
             };
 
             // authStatusEl.value = "Gaba";
