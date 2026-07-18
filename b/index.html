@@ -299,15 +299,28 @@
                 // = authStatusEl.value
                 authStatusEl.value = authStatusEl.value + "\n" + msg.data;
                 
+                // loadKeys(dB)
                 inDat = JSON.parse(msg);
-                response = {
-                    signature: signMessage(inDat.challenge,keyPair),
-                    type: "device",
-                    deviceId: deviceIdEl.value,
-                    deviceType: deviceTypeEl.value
-                };
-                authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
+                // const pubEl = document.getElementById("publickey");
+
+                // response = {
+                //     signature: signMessage(inDat.challenge,pubEl.value),
+                //     type: "device",
+                //     deviceId: deviceIdEl.value,
+                //     deviceType: deviceTypeEl.value
+                // };
+                // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
+                // ws.send(JSON.stringify(response));
+                // response = {
+                //     signature: "glaba",
+                //     type: "device",
+                //     deviceId: deviceIdEl.value,
+                //     deviceType: deviceTypeEl.value
+                // };
+                authStatusEl.value = authStatusEl.value + "\nSending this response:" 
+                //+ JSON.stringify(response); 
                 ws.send(JSON.stringify(response));
+
             };
 
             // authStatusEl.value = "Gaba";
