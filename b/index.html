@@ -242,11 +242,12 @@
 
     <h4>Register the device</h4>
     <p>The page will remember your settings so you need only input them once.</p>
-    <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default https://mac.taild17908.ts.net/)" default="mac...">https://mac.taild17908.ts.net/</textarea> <br />
+    <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default https://mac.taild17908.ts.net/)"
+        default="mac...">https://mac.taild17908.ts.net/</textarea> <br />
     <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br />
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use eyes1)">eyes1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use eyes)">eyes</textarea> <br />
-    <button id="registerNow">Register Now</button><br/><br/>
+    <button id="registerNow">Register Now</button><br /><br />
     <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
 
 
@@ -262,31 +263,31 @@
         savedprojectName = localStorage.getItem("projectName");
         saveddeviceId = localStorage.getItem("deviceId");
         saveddeviceType = localStorage.getItem("deviceType");
-        
-        if (savedserverURL){
+
+        if (savedserverURL) {
             serverURLEl.textContent = savedserverURL;
         }
-        if (savedprojectName){
+        if (savedprojectName) {
             projectNameEl.textContent = savedprojectName;
         }
-        if (saveddeviceId){
+        if (saveddeviceId) {
             deviceIdEl.textContent = saveddeviceId;
         }
-        if (saveddeviceType){
+        if (saveddeviceType) {
             deviceTypeEl.textContent = saveddeviceType;
         }
 
 
         registerNowEl.addEventListener("click", () => {
-            localStorage.setItem("serverURL",serverURLEl.value); //careful, if you use textContent, this will be stale
-            localStorage.setItem("projectName",projectNameEl.value);
-            localStorage.setItem("deviceId",deviceIdEl.value);
-            localStorage.setItem("deviceType",deviceTypeEl.value);
+            localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
+            localStorage.setItem("projectName", projectNameEl.value);
+            localStorage.setItem("deviceId", deviceIdEl.value);
+            localStorage.setItem("deviceType", deviceTypeEl.value);
 
-            regStatusEl.value="Gaba";
-            regStatusEl.value="gleeba";
+            regStatusEl.value = "Gaba";
+            regStatusEl.value = "gleeba";
         });
-    </script>    
+    </script>
     <!-- <script>
         serverURLEl = document.getElementById("serverURL");
         projectNameEl = document.getElementById("projectName");
@@ -379,7 +380,7 @@
             ws.onmessage = function (event) {
                 document.getElementById('incoming').value = document.getElementById('incoming').value + "\n" + event.data;
             };
-            
+
             //   const input = document.getElementById('outgoing');
             //   const message = input.value;
 
