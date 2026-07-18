@@ -303,10 +303,17 @@
                 inDat = JSON.parse(msg.data);
                 const pubEl = document.getElementById("publickey");
 
+                // signMessage(messageToSignEl.textContent, keyPair).then(
+                //     res => { signatureEl.textContent = res }
+                // );
+                let signature = null
+
+                signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
+
                 response = {
                     type: "device",
                     device: {
-                        signature: "hello", //signMessage(inDat.challenge,pubEl.value),
+                        signature: signature , //signMessage(inDat.challenge,pubEl.value),
                         id: deviceIdEl.value,
                         type: deviceTypeEl.value,
                         publicKey: pubEl.value
