@@ -304,10 +304,13 @@
                 // const pubEl = document.getElementById("publickey");
 
                 response = {
-                    signature: "hello", //signMessage(inDat.challenge,pubEl.value),
                     type: "device",
-                    deviceId: deviceIdEl.value,
-                    deviceType: deviceTypeEl.value
+                    device: {
+                        signature: "hello", //signMessage(inDat.challenge,pubEl.value),
+                        id: deviceIdEl.value,
+                        type: deviceTypeEl.value,
+                        publicKey: "test key"
+                    }
                 };
 
                 // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
