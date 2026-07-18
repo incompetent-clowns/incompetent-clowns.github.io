@@ -250,8 +250,8 @@
 
     <h4>Authenticate the device</h4>
     <p>The page will remember your settings so you need only input them once.</p>
-    <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default https://mac.taild17908.ts.net/)"
-        default="mac...">https://mac.taild17908.ts.net/</textarea> <br />
+    <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default wss://mac.taild17908.ts.net/)"
+        default="mac...">wss://mac.taild17908.ts.net/</textarea> <br />
     <!-- <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br /> -->
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use cam1)">cam1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
@@ -292,9 +292,40 @@
             localStorage.setItem("deviceId", deviceIdEl.value);
             localStorage.setItem("deviceType", deviceTypeEl.value);
 
-            authStatusEl.value = "Gaba";
-            authStatusEl.value = "gleeba";
+            ws = new WebSocket(serverURLEl.value); //('wss://mac.taild17908.ts.net/'); //+ location.host);
+
+            ws.onmessage = function (event) {
+                authStatusEl.value = authStatusEl.value + "\n" + event.data;
+            };
+
+            // authStatusEl.value = "Gaba";
+            // authStatusEl.value = "gleeba";
         });
+
+
+    // <script>
+    //     // Placeholder function for sending messages
+    //     function sendMessage() {
+    //         // https://mac.taild17908.ts.net/
+    //         const ws = new WebSocket('wss://mac.taild17908.ts.net/'); //+ location.host);
+    //         // const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
+
+    //         // ws.send("id:")
+    //         ws.onmessage = function (event) {
+    //             document.getElementById('incoming').value = document.getElementById('incoming').value + "\n" + event.data;
+    //         };
+
+    //         //   const input = document.getElementById('outgoing');
+    //         //   const message = input.value;
+
+    //         // For now, just echo it to the incoming box
+    //         //   const incomingBox = document.getElementById('incoming');
+    //         //   incomingBox.value += message + "\n";
+
+    //         //   input.value = '';
+    //     }
+    // </script>
+
     </script>
     <!-- <script>
         serverURLEl = document.getElementById("serverURL");
