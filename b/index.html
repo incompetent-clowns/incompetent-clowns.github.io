@@ -114,7 +114,8 @@
             const db = await openDB();
 
             // let keyPair = null;
-            keyPair = null;
+            globalThis.keyPair = null;
+            // keyPair = null;
 
             if (!forceNew) {
                 statusEl.textContent = "Checking for existing keys...";
@@ -324,6 +325,7 @@
                 inDat = JSON.parse(msg.data);
                 const pubEl = document.getElementById("publickey");
 
+                // globalThis.keyPair
                 // signMessage(messageToSignEl.textContent, keyPair).then(
                 //     res => { signatureEl.textContent = res }
                 // );
