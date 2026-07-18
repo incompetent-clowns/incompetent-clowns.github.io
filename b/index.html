@@ -301,7 +301,7 @@
                 
                 // loadKeys(dB)
                 inDat = JSON.parse(msg.data);
-                // const pubEl = document.getElementById("publickey");
+                const pubEl = document.getElementById("publickey");
 
                 response = {
                     type: "device",
@@ -309,7 +309,7 @@
                         signature: "hello", //signMessage(inDat.challenge,pubEl.value),
                         id: deviceIdEl.value,
                         type: deviceTypeEl.value,
-                        publicKey: "test key"
+                        publicKey: pubEl.value
                     }
                 };
 
