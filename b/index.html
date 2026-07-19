@@ -114,8 +114,8 @@
             const db = await openDB();
 
             // let keyPair = null;
-            globalThis.keyPair = null;
-            // keyPair = null;
+            // globalThis.keyPair = null;
+            keyPair = null;
 
             if (!forceNew) {
                 statusEl.textContent = "Checking for existing keys...";
@@ -332,7 +332,7 @@
                 // let signature = null
 
                 // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
-                authStatusEl.value = authStatusEl.value + "\nThis should be private:" + JSON.stringify(keyPair.privateKey)
+                authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(keyPair.publicKey)
                 const signature = await a_signMessage(inDat.challenge, keyPair);
 
                 response = {
