@@ -333,7 +333,7 @@
 
                 // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
                 // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
-                pubKey = await exportPublicKey(keyPair.publicKey)
+                pubKey = await exportPublicKey("spki",keyPair.publicKey)
                 const signature = await a_signMessage(inDat.challenge, keyPair);
 
                 response = {
