@@ -325,6 +325,8 @@
                 inDat = JSON.parse(msg.data);
                 const pubEl = document.getElementById("publickey");
 
+                authStatusEl.value = authStatusEl.value + "\nChallenge: " + inDat.payload.challenge; //+ "\nResult" + Buffer.from(inDat.challenge, "utf8").toString("hex");
+
                 // globalThis.keyPair
                 // signMessage(messageToSignEl.textContent, keyPair).then(
                 //     res => { signatureEl.textContent = res }
@@ -334,7 +336,9 @@
                 // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
                 // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
                 pubKey = await exportPublicKey(keyPair.publicKey)
-                const signature = await a_signMessage(inDat.challenge, keyPair);
+                const signature = await a_signMessage(inDat.payload.challenge, keyPair);
+
+                
 
                 response = {
                     type: "device",
