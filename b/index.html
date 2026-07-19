@@ -194,7 +194,7 @@
             );
 
             return toBase64(signatureBuffer);
-        }        
+        }
 
     </script>
 
@@ -320,48 +320,56 @@
                 // let _ = authStatusEl.value 
                 // = authStatusEl.value
                 authStatusEl.value = authStatusEl.value + "\n" + msg.data;
-                
+
+
                 // loadKeys(dB)
                 inDat = JSON.parse(msg.data);
-                const pubEl = document.getElementById("publickey");
 
-                authStatusEl.value = authStatusEl.value + "\nChallenge: " + inDat.payload.challenge; //+ "\nResult" + Buffer.from(inDat.challenge, "utf8").toString("hex");
+                if (inDat.type == "auth") {
 
-                // globalThis.keyPair
-                // signMessage(messageToSignEl.textContent, keyPair).then(
-                //     res => { signatureEl.textContent = res }
-                // );
-                // let signature = null
+                    const pubEl = document.getElementById("publickey");
 
-                // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
-                // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
-                pubKey = await exportPublicKey(keyPair.publicKey)
-                const signature = await a_signMessage(inDat.payload.challenge, keyPair);
+                    authStatusEl.value = authStatusEl.value + "\nChallenge: " + inDat.payload.challenge; //+ "\nResult" + Buffer.from(inDat.challenge, "utf8").toString("hex");
 
-                
+                    // globalThis.keyPair
+                    // signMessage(messageToSignEl.textContent, keyPair).then(
+                    //     res => { signatureEl.textContent = res }
+                    // );
+                    // let signature = null
 
-                response = {
-                    type: "device",
-                    device: {
-                        signature: signature, //signMessage(inDat.challenge,pubEl.value),
-                        id: deviceIdEl.value,
-                        type: deviceTypeEl.value,
-                        publicKey: pubKey //pubEl.value
-                    }
-                };
+                    // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
+                    // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
+                    pubKey = await exportPublicKey(keyPair.publicKey)
+                    const signature = await a_signMessage(inDat.payload.challenge, keyPair);
 
-                // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
-                // ws.send(JSON.stringify(response));
-                // response = {
-                //     signature: "glaba",
-                //     type: "device",
-                //     deviceId: deviceIdEl.value,
-                //     deviceType: deviceTypeEl.value
-                // };
 
-                authStatusEl.value = authStatusEl.value + "\nSending this response:" 
-                + JSON.stringify(response); 
-                ws.send(JSON.stringify(response));
+
+                    response = {
+                        type: "device",
+                        device: {
+                            signature: signature, //signMessage(inDat.challenge,pubEl.value),
+                            id: deviceIdEl.value,
+                            type: deviceTypeEl.value,
+                            publicKey: pubKey //pubEl.value
+                        }
+                    };
+
+                    // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
+                    // ws.send(JSON.stringify(response));
+                    // response = {
+                    //     signature: "glaba",
+                    //     type: "device",
+                    //     deviceId: deviceIdEl.value,
+                    //     deviceType: deviceTypeEl.value
+                    // };
+
+                    authStatusEl.value = authStatusEl.value + "\nSending this response:"
+                        + JSON.stringify(response);
+                    ws.send(JSON.stringify(response));
+                }
+                // else{
+                    // msg.payload
+                // }
 
             };
 
@@ -370,28 +378,28 @@
         });
 
 
-    // <script>
-    //     // Placeholder function for sending messages
-    //     function sendMessage() {
-    //         // https://mac.taild17908.ts.net/
-    //         const ws = new WebSocket('wss://mac.taild17908.ts.net/'); //+ location.host);
-    //         // const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
+        // <script>
+        //     // Placeholder function for sending messages
+        //     function sendMessage() {
+        //         // https://mac.taild17908.ts.net/
+        //         const ws = new WebSocket('wss://mac.taild17908.ts.net/'); //+ location.host);
+        //         // const ws = new WebSocket('ws://localhost:3030'); //+ location.host);
 
-    //         // ws.send("id:")
-    //         ws.onmessage = function (event) {
-    //             document.getElementById('incoming').value = document.getElementById('incoming').value + "\n" + event.data;
-    //         };
+        //         // ws.send("id:")
+        //         ws.onmessage = function (event) {
+        //             document.getElementById('incoming').value = document.getElementById('incoming').value + "\n" + event.data;
+        //         };
 
-    //         //   const input = document.getElementById('outgoing');
-    //         //   const message = input.value;
+        //         //   const input = document.getElementById('outgoing');
+        //         //   const message = input.value;
 
-    //         // For now, just echo it to the incoming box
-    //         //   const incomingBox = document.getElementById('incoming');
-    //         //   incomingBox.value += message + "\n";
+        //         // For now, just echo it to the incoming box
+        //         //   const incomingBox = document.getElementById('incoming');
+        //         //   incomingBox.value += message + "\n";
 
-    //         //   input.value = '';
-    //     }
-    // </script>
+        //         //   input.value = '';
+        //     }
+        // </script>
 
     </script>
     <!-- <script>
