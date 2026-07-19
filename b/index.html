@@ -321,7 +321,7 @@
             ws.onmessage = async function (msg) {
                 // let _ = authStatusEl.value 
                 // = authStatusEl.value
-                authStatusEl.value = authStatusEl.value + "\nMessage Received:\n" + msg.data;
+                authStatusEl.value = authStatusEl.value + "\n\nMessage Received:\n" + msg.data;
 
 
                 // loadKeys(dB)
@@ -365,7 +365,7 @@
                     //     deviceType: deviceTypeEl.value
                     // };
 
-                    authStatusEl.value = authStatusEl.value + "\nSending this response:\n"
+                    authStatusEl.value = authStatusEl.value + "\n\nSending this response:\n"
                         + JSON.stringify(response);
                     ws.send(JSON.stringify(response));
                 }
