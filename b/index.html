@@ -332,7 +332,8 @@
                 // let signature = null
 
                 // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
-                authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(keyPair.publicKey)
+                // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
+                pubKey = await exportPublicKey(keyPair.publicKey)
                 const signature = await a_signMessage(inDat.challenge, keyPair);
 
                 response = {
@@ -341,7 +342,7 @@
                         signature: signature , //signMessage(inDat.challenge,pubEl.value),
                         id: deviceIdEl.value,
                         type: deviceTypeEl.value,
-                        publicKey: pubEl.value
+                        publicKey: pubKey //pubEl.value
                     }
                 };
 
