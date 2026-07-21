@@ -8,7 +8,7 @@
     <body>
         <h1>Project B | User</h1>
 
-        <button id="test">Test Post</button>
+        <button id="resetWebRTC">Request remote WebRTC reset</button>
         <br>
         <button id="login">Login with Google</button>
         <br><br>
@@ -113,6 +113,11 @@
                         statusEl.value = statusEl.value + `\nDone\n`;
                     }
                 };
+            }
+
+            document.getElementById("resetWebRTC").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                send({Type: "resetWebRTC", to:deviceID});
             }
 
             document.getElementById("connect").onclick = async () => {

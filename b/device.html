@@ -379,6 +379,14 @@
                     ws.send(JSON.stringify(response));
                 }
 
+                if(inDat.Type == "resetWebRTC"){
+                    if(pc){
+                        pc.close()
+                        pc = null
+                    }
+                
+                }
+
                 //Handling things for WebRTC now
                 if (inDat.type == "offer") {
                     authStatusEl.value = authStatusEl.value + "\n\nOffer Received\n"
