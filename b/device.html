@@ -290,6 +290,11 @@
         saveddeviceId = localStorage.getItem("deviceId");
         saveddeviceType = localStorage.getItem("deviceType");
 
+        let pc;
+        let localStream;
+        let ws;
+
+
         if (savedserverURL) {
             serverURLEl.textContent = savedserverURL;
         }
@@ -315,8 +320,11 @@
             localStorage.setItem("deviceId", deviceIdEl.value);
             localStorage.setItem("deviceType", deviceTypeEl.value);
 
+            authStatusEl.value = authStatusEl.value + "\nInitialising WebRTC"
+            await ensurePeerConnection()
+
             ws = new WebSocket(serverURLEl.value); //('wss://mac.taild17908.ts.net/'); //+ location.host);
-            
+
             authStatusEl.value = authStatusEl.value + "\nCreating a websocket"
 
             ws.onmessage = async function (msg) {
@@ -328,7 +336,7 @@
                 // loadKeys(dB)
                 inDat = JSON.parse(msg.data);
 
-                if (inDat.type == "auth") {
+                if (inDat.Type == "auth") {
 
                     const pubEl = document.getElementById("publickey");
 
@@ -348,11 +356,11 @@
 
 
                     response = {
-                        type: "device",
+                        Type: "device",
                         device: {
                             signature: signature, //signMessage(inDat.challenge,pubEl.value),
                             id: deviceIdEl.value,
-                            type: deviceTypeEl.value,
+                            Type: deviceTypeEl.value,
                             publicKey: pubKey //pubEl.value
                         }
                     };
@@ -370,18 +378,82 @@
                         + JSON.stringify(response);
                     ws.send(JSON.stringify(response));
                 }
+
+                //Handling things for WebRTC now
+                if (inDat.type == "offer") {
+                    authStatusEl.value = authStatusEl.value + "\n\nOffer Received\n"
+                    //Ensures the "pc" variable is initialised
+                    await ensurePeerConnection();
+                    authStatusEl.value = authStatusEl.value + `\nPeer Connection setup\n${inDat.sdp}\n`
+                    await pc.setRemoteDescription(inDat.sdp);
+                    authStatusEl.value = authStatusEl.value + "\nRemote Description Added\n"
+                    const answer = await pc.createAnswer();
+                    authStatusEl.value = authStatusEl.value + "\nAnswer Created\n"
+                    await pc.setLocalDescription(answer);
+                    authStatusEl.value = authStatusEl.value + "\nLocal Description Updated\n"
+                    // send({ type: "answer", to: inDat.from, sdp: answer });
+                    // ws.send(JSON.stringify({ type: "answer", to: "_user_", sdp: answer }));
+                    ws.send(JSON.stringify({ type: "answer", to: inDat.from, sdp: answer }));
+                    authStatusEl.value = authStatusEl.value + "\nSent the configuration\n"
+                }
+
+                if (inDat.type == "ice") {
+                    await pc.addIceCandidate(inDat.candidate);
+                }
                 // else{
-                    // msg.payload
+                // msg.payload
                 // }
 
             };
+
+
+            //TODO: add a reconnect loop if the ws connection drops
 
             // authStatusEl.value = "Gaba";
             // authStatusEl.value = "gleeba";
         });
 
 
-        // <script>
+
+
+
+        // WEBRTC setup 
+        async function ensurePeerConnection() {
+            if (pc) return;
+
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+
+            document.getElementById("local").srcObject = localStream;
+
+            //Creates a WebRTC connection object
+            //The stun servers basically tell the object
+            //how our device can be reached for someone on the web
+            pc = new RTCPeerConnection({
+                iceServers: [
+                    { urls: "stun:stun.l.google.com:19302" }
+                ]
+            });
+
+            localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+            //When the other person's stream becomes available
+            // run the function "e"
+            pc.ontrack = e => {
+                document.getElementById("remote").srcObject = e.streams[0];
+            };
+
+            pc.onicecandidate = e => {
+                if (e.candidate) {                    
+                    ws.send(JSON.stringify({ type: "ice", to: "_user_", candidate: e.candidate }));
+                }
+            }
+        }
+
+
+    </script>
+
+    //
+    <script>
         //     // Placeholder function for sending messages
         //     function sendMessage() {
         //         // https://mac.taild17908.ts.net/
@@ -403,8 +475,12 @@
         //         //   input.value = '';
         //     }
         // </script>
+    <h3>Local</h3>
+    <video id="local" autoplay muted playsinline></video>
 
-    </script>
+    <h3>Remote</h3>
+    <video id="remote" autoplay playsinline></video>
+
     <!-- <script>
         serverURLEl = document.getElementById("serverURL");
         projectNameEl = document.getElementById("projectName");

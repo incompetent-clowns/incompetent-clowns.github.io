@@ -1,0 +1,200 @@
+<!DOCWTYPE html>
+    <html>
+
+    <head>
+        <title>Project B | User</title>
+    </head>
+
+    <body>
+        <h1>Project B | User</h1>
+
+        <button id="test">Test Post</button>
+        <br>
+        <button id="login">Login with Google</button>
+        <br><br>
+
+        <input id="deviceID" placeholder="device ID" />
+        <button id="connect">Connect</button>
+
+        <br><br>
+        <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
+
+
+        <h3>Local</h3>
+        <video id="local" autoplay muted playsinline></video>
+
+        <h3>Remote</h3>
+        <video id="remote" autoplay playsinline></video>
+
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script>
+
+            const BACKEND = "https://mac.taild17908.ts.net"; //:10000
+            const WS_BACKEND = "wss://mac.taild17908.ts.net";
+
+            statusEl = document.getElementById("regStatus");
+            deviceIDEl = document.getElementById("deviceID");
+
+            let socket;
+            let pc;
+            let localStream;
+            let myEmail;
+
+            // Google Login
+            window.onload = async () => {
+                google.accounts.id.initialize({
+                    client_id: "485427982591-ug9t0vdn3cmu5bh3s9s63h3k6vmpfj45.apps.googleusercontent.com",
+                    callback: handleGoogleLogin
+                });
+
+                document.getElementById("login").onclick = () => {
+                    google.accounts.id.prompt();
+                };
+
+                await ensurePeerConnection();
+                // document.getElementById("test").onclick = async () => {
+                //     statusEl.value = statusEl.value + `Sending a POST\n`
+
+                //     const res = await fetch(`${BACKEND}/auth/google`, {
+                //         method: "POST",
+                //         headers: { "Content-WType": "application/json" },
+                //         body: JSON.stringify({ idToken: "Gababa" })
+                //     });
+                //     statusEl.value = statusEl.value + `Response from the server:\n ${res}\n${JSON.stringify(res)}\n`
+                // };
+            };
+
+            async function handleGoogleLogin(response) {
+                statusEl.value = statusEl.value + `Attempting authentication with Google.\nGoogle sent: ${response.credential}\n`
+
+                const res = await fetch(`${BACKEND}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ idToken: response.credential })
+                });
+                statusEl.value = statusEl.value + `Response from the server: ${res}\n`
+
+                const data = await res.json();
+
+                statusEl.value = statusEl.value + `Obtained the following token\n${data.token}`;
+
+                statusEl.value = statusEl.value + `Trying a websocket connection now.`;
+                connectWebSocket(data.token);
+            }
+
+            // Websocket 
+            function connectWebSocket(token) {
+                statusEl.value = statusEl.value + `Websocket connection initiated, using the following token\n${token}`
+                socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
+
+                socket.onmessage = async (event) => {
+                    let msg = JSON.parse(event.data);
+
+                    statusEl.value = statusEl.value + `\nReceived:\n${event.data}`;
+                    // if (msg.Wtype === "offer") {
+                    //     await ensurePeerConnection();
+                    //     await pc.setRemoteDescription(msg.sdp);
+                    //     const answer = await pc.createAnswer();
+                    //     await pc.setLocalDescription(answer);
+                    //     send({ Wtype: "answer", to: msg.from, sdp: answer });
+                    // }
+
+                    if (msg.type === "answer") {
+                        statusEl.value = statusEl.value + `\nSetting Remote Description\n${JSON.stringify(msg.sdp)}`;
+                        // await ensurePeerConnection();
+                        await pc.setRemoteDescription(msg.sdp);
+                        statusEl.value = statusEl.value + `\nDone\n`;
+                    }
+
+                    if (msg.type === "ice") {
+                        statusEl.value = statusEl.value + `\nAdding Ice Candidate\n${JSON.stringify(msg.candidate)}`;
+                        // await ensurePeerConnection();
+                        await pc.addIceCandidate(msg.candidate);
+                        statusEl.value = statusEl.value + `\nDone\n`;
+                    }
+                };
+            }
+
+            document.getElementById("connect").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                await ensurePeerConnection();
+
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer)
+
+                send({ type: "offer", to: deviceID, sdp: offer });
+            }
+
+            function send(msg) {
+                socket.send(JSON.stringify(msg));
+            }
+
+
+            //TODO: replace currentPeer with deviceID 
+            function currentPeer() {
+                // return document.getElementById("deviceID").value;
+                return deviceIDEl.value;
+            }
+
+            async function ensurePeerConnection() {
+                if (pc) return;
+
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+
+                document.getElementById("local").srcObject = localStream;
+
+                pc = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: "stun:stun.l.google.com:19302" }
+                    ]
+                });
+
+                localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+                pc.ontrack = e => {
+                    document.getElementById("remote").srcObject = e.streams[0];
+                };
+
+                pc.onicecandidate = e => {
+                    if (e.candidate) {
+                        send({ type: "ice", to: currentPeer(), candidate: e.candidate });
+                    }
+                };
+            }
+            // async function ensurePeerConnection() {
+            //     if (pc) return;
+
+            //     localStream = await navigator.mediaDevices.getUserMedia({
+            //         video: true,
+            //         audio: true
+            //     });
+
+            //     document.getElementById("local").srcObject = localStream;
+
+            //     pc = new RTCPeerConnection({
+            //         iceServers: [
+            //             { urls: "stun:stun.l.google.com:19302" }
+            //         ]
+            //     });
+
+            //     localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+            //     pc.ontrack = e => {
+            //         document.getElementById("remote").srcObject = e.streams[0];
+            //     };
+
+            //     pc.onicecandidate = e => {
+            //         if (e.candidate) {
+            //             send({ type: "ice", to: currentPeer(), candidate: e.candidate });
+            //         }
+            //     };
+            // }
+
+        </script>
+
+    </body>
+
+    </html>
