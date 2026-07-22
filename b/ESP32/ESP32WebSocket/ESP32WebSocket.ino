@@ -714,12 +714,11 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     // JsonDocument
                     JsonDocument response;
                     response["Type"] = "device";
-                    JsonObject device_;
+                    JsonObject device_ = response["device"].to<JsonObject>();
                     device_["publicKey"] = "Working on it";
                     device_["id"] = "ESP32-1";
                     device_["signature"] = str_challenge; //"Working on it";
                     device_["Type"] = "ESP32";
-                    response["device"] = device_;
                     String str_response;
                     serializeJson(response,str_response);
                     Serial.println("Sending:" + str_response);
