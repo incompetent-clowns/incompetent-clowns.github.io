@@ -225,15 +225,263 @@
 
 
 // ////////////////////////////////////////////////////////////////////////////////
+// THIS WORKED!!
+// #include <WiFi.h>
+// #include <WebSocketsClient.h>
 
+// const char *ssid = "Airtel_7000000000";
+// const char *password = "air81588";
+
+// WebSocketsClient ws;
+
+// void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
+// {
+//     switch (type)
+//     {
+//         case WStype_CONNECTED:
+//             Serial.println("Connected!");
+//             ws.sendTXT("Hello from ESP32");
+//             break;
+
+//         case WStype_TEXT:
+//             Serial.print("RX: ");
+//             Serial.println((char *)payload);
+//             break;
+
+//         case WStype_DISCONNECTED:
+//             Serial.println("Disconnected");
+//             break;
+
+//         case WStype_ERROR:
+//             Serial.println("WebSocket error");
+//             break;
+
+//         default:
+//             break;
+//     }
+// }
+
+// void setup()
+// {
+//     Serial.begin(115200);
+
+//     WiFi.begin(ssid, password);
+
+//     Serial.print("Connecting to WiFi");
+//     while (WiFi.status() != WL_CONNECTED)
+//     {
+//         delay(500);
+//         Serial.print(".");
+//     }
+
+//     Serial.println("\nWiFi connected.");
+
+//     //
+//     // host, port, path, protocol
+//     //
+//     ws.beginSSL(
+//         "mac.taild17908.ts.net",
+//         443,
+//         "/",
+//         ""          // <-- disable "arduino" subprotocol
+//     );
+
+//     ws.onEvent(webSocketEvent);
+
+//     ws.enableHeartbeat(15000, 3000, 2);
+
+//     ws.setReconnectInterval(5000);
+// }
+
+// void loop()
+// {
+//     ws.loop();
+// }
+
+
+
+////////////////////////// TRYING TO ADD THE CRYPTO PART
+
+#include <LittleFS.h>
+
+#include "mbedtls/pk.h"
+#include "mbedtls/ecp.h"
+#include "mbedtls/ecdsa.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/base64.h"
+#include "mbedtls/sha256.h"
+
+////////////////////////
 #include <WiFi.h>
 #include <WebSocketsClient.h>
-
 const char *ssid = "Airtel_7000000000";
 const char *password = "air81588";
 
 WebSocketsClient ws;
+///////////////////////////
 
+
+//----------------------------
+mbedtls_pk_context pk;
+mbedtls_entropy_context entropy;
+mbedtls_ctr_drbg_context ctr_drbg;
+
+const char *KEY_FILE = "/ecdsa.pem";
+
+bool initRandom()
+{
+    mbedtls_entropy_init(&entropy);
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+
+    const char *pers = "esp32-ecdsa";
+
+    int ret = mbedtls_ctr_drbg_seed(
+        &ctr_drbg,
+        mbedtls_entropy_func,
+        &entropy,
+        (const unsigned char *)pers,
+        strlen(pers));
+
+    return ret == 0;
+}
+
+
+bool generateKey()
+{
+    mbedtls_pk_init(&pk);
+
+    int ret = mbedtls_pk_setup(
+        &pk,
+        mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+
+    if (ret != 0)
+        return false;
+
+    ret = mbedtls_ecp_gen_key(
+        MBEDTLS_ECP_DP_SECP256R1,
+        mbedtls_pk_ec(pk),
+        mbedtls_ctr_drbg_random,
+        &ctr_drbg);
+
+    return ret == 0;
+}
+
+
+bool saveKey()
+{
+    unsigned char buffer[1600];
+
+    int len = mbedtls_pk_write_key_pem(
+        &pk,
+        buffer,
+        sizeof(buffer));
+
+    if (len != 0)
+        return false;
+
+    File f = LittleFS.open(KEY_FILE, "w");
+    if (!f)
+        return false;
+
+    f.print((char *)buffer);
+    f.close();
+
+    return true;
+}
+
+bool loadKey()
+{
+    if (!LittleFS.exists(KEY_FILE))
+        return false;
+
+    File f = LittleFS.open(KEY_FILE, "r");
+    if (!f)
+        return false;
+
+    String pem = f.readString();
+
+    f.close();
+
+    mbedtls_pk_init(&pk);
+
+    int ret = mbedtls_pk_parse_key(
+        &pk,
+        (const unsigned char *)pem.c_str(),
+        pem.length() + 1,
+        NULL,
+        0,
+        mbedtls_ctr_drbg_random,
+        &ctr_drbg);
+
+    return ret == 0;
+}
+
+
+void printPublicKey()
+{
+    unsigned char buffer[800];
+
+    int ret = mbedtls_pk_write_pubkey_pem(
+        &pk,
+        buffer,
+        sizeof(buffer));
+
+    if (ret == 0)
+    {
+        Serial.println("Public key:");
+        Serial.println((char *)buffer);
+    }
+}
+
+
+
+void signMessage(const String &message)
+{
+    unsigned char hash[32];
+
+    mbedtls_sha256(
+        (const unsigned char *)message.c_str(),
+        message.length(),
+        hash,
+        0);
+
+    unsigned char signature[100];
+    size_t sigLen = 0;
+
+    int ret = mbedtls_pk_sign(
+        &pk,
+        MBEDTLS_MD_SHA256,
+        hash,
+        0,
+        signature,
+        &sigLen,
+        mbedtls_ctr_drbg_random,
+        &ctr_drbg);
+
+    if (ret != 0)
+    {
+        Serial.println("Signing failed");
+        return;
+    }
+
+    unsigned char base64[300];
+    size_t outLen;
+
+    mbedtls_base64_encode(
+        base64,
+        sizeof(base64),
+        &outLen,
+        signature,
+        sigLen);
+
+    Serial.println("Signature:");
+    Serial.println((char *)base64);
+}
+//---------------------------------
+
+
+///////////////////////
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
     switch (type)
@@ -275,6 +523,26 @@ void setup()
     }
 
     Serial.println("\nWiFi connected.");
+
+//////-------------------v
+    LittleFS.begin();
+    initRandom();
+
+    if (!loadKey())
+    {
+        Serial.println("Generating new key...");
+        generateKey();
+        saveKey();
+    }
+    else
+    {
+        Serial.println("Loaded existing key.");
+    }    
+
+    printPublicKey();
+
+//////------------------------^
+
 
     //
     // host, port, path, protocol
