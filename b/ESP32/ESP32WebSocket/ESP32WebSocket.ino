@@ -5,7 +5,7 @@
 
 #include "Config.h"
 
-using namespace websockets;
+// using namespace websockets;
 
 // WebsocketsClient client;
 WiFiClientSecure tcp;
