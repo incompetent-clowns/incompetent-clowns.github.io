@@ -459,7 +459,7 @@ void printPublicKey()
     mbedtls_mpi_write_binary(
         &key.MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(Y),
         y,
-        32);
+        32);    
 
     Serial.println("Public X:");
     printHex(x, 32);
@@ -516,6 +516,71 @@ void signMessage(const String &msg)
     Serial.println(" bytes):");
 
     printHex(sig, sigLen);
+}
+
+
+
+void printPublicKey_()
+{
+    mbedtls_pk_context pk;
+    mbedtls_pk_init(&pk);
+
+    int ret = mbedtls_pk_setup(
+        &pk,
+        mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+
+    if (ret != 0)
+    {
+        Serial.printf("pk_setup failed: %d\n", ret);
+        return;
+    }
+
+    // Get the EC keypair inside the pk context
+    mbedtls_ecp_keypair *ec = mbedtls_pk_ec(pk);
+
+    // Copy our existing key into it
+    mbedtls_ecp_group_copy(&ec->grp, &key.MBEDTLS_PRIVATE(grp));
+    mbedtls_mpi_copy(&ec->d, &key.MBEDTLS_PRIVATE(d));
+    mbedtls_ecp_copy(&ec->Q, &key.MBEDTLS_PRIVATE(Q));
+
+    unsigned char der[128];
+
+    ret = mbedtls_pk_write_pubkey_der(
+        &pk,
+        der,
+        sizeof(der));
+
+    if (ret < 0)
+    {
+        Serial.printf("write_pubkey_der failed: %d\n", ret);
+        mbedtls_pk_free(&pk);
+        return;
+    }
+
+    // DER is written at the END of the buffer.
+    unsigned char *pub = der + sizeof(der) - ret;
+    size_t pubLen = ret;
+
+    Serial.printf("DER length = %u\n", (unsigned)pubLen);
+
+    printHex(pub, pubLen);
+
+    // Optional: Base64 encode for sending to Node.js
+    unsigned char b64[256];
+    size_t b64Len;
+
+    mbedtls_base64_encode(
+        b64,
+        sizeof(b64),
+        &b64Len,
+        pub,
+        pubLen);
+
+    b64[b64Len] = '\0';
+
+    Serial.println((char *)b64);
+
+    mbedtls_pk_free(&pk);
 }
 //-------------------
 
