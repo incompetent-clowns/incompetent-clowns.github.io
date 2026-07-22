@@ -60,7 +60,8 @@ void connectWebSocket()
 
     String url =
         "wss://" +
-        String(WS_HOST) +
+        String(WS_HOST);
+        //+
         // "ws://" +
         // String(WS_PATH);
         // ":" +
@@ -83,6 +84,8 @@ void setup()
 
     delay(1000);
 
+    Serial.println("Gaba! Can you read me?");
+
     connectWiFi();
 
     connectWebSocket();
@@ -90,6 +93,7 @@ void setup()
 
 void loop()
 {
+    Serial.println("Glaba loop!");
     client.poll();
 
     if(WiFi.status() != WL_CONNECTED)
