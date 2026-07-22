@@ -61,23 +61,32 @@ void connectWiFi()
         Serial.println("TLS failed");
     }
 
-    Serial.println("Trying to upgrade manually");
-    tcp.print(
-    "GET / HTTP/1.1\r\n"
-    "Host: mac.taild17908.ts.net\r\n"
-    "Upgrade: websocket\r\n"
-    "Connection: Upgrade\r\n"
-    "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
-    "Sec-WebSocket-Version: 13\r\n"
-    "\r\n");
+    // Serial.println("Trying to upgrade manually");
+    // tcp.print(
+    // "GET / HTTP/1.1\r\n"
+    // "Host: mac.taild17908.ts.net\r\n"
+    // "Upgrade: websocket\r\n"
+    // "Connection: Upgrade\r\n"
+    // "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+    // "Sec-WebSocket-Version: 13\r\n"
+    // "\r\n");
 
-    delay(5000);
-
+    Serial.println("Testing HTTPS GET");
     tcp.print(
         "GET / HTTP/1.1\r\n"
         "Host: mac.taild17908.ts.net\r\n"
+        "User-Agent: ESP32\r\n"
         "Connection: close\r\n"
-        "\r\n");    
+        "\r\n");
+
+    // delay(5000);
+
+    // tcp.print(
+    //     "GET / HTTP/1.1\r\n"
+    //     "Host: mac.taild17908.ts.net\r\n"
+    //     "Connection: close\r\n"
+    //     "\r\n");    
+
     // tcp.setInsecure();
     // client.setClient(&tcp);
 
@@ -164,15 +173,29 @@ void loop()
         connectWiFi();
     }
 
+    unsigned long timeout = millis();
 
-    while (tcp.available())
+    while (tcp.connected() && millis() - timeout < 10000)
     {
-        // Serial.write(tcp.read());
-        Serial.print(tcp.read());
+        while (tcp.available())
+        {
+            char c = tcp.read();
+            Serial.write(c);
+            timeout = millis();      // reset timeout whenever data arrives
+        }
+
+        delay(10);
     }
 
+    // while (tcp.available())
+    // {
+    //     // Serial.write(tcp.read());
+    //     Serial.write(tcp.read());
+    // }
+
     if (!tcp.connected()) {
-        Serial.println("\nConnection closed.");
+        Serial.println("Connection closed.");
+        delay(9000);
         // break;
     }
 
