@@ -25,10 +25,26 @@ void connectWiFi()
 
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
+
+
+    IPAddress ip;
+
+    if (WiFi.hostByName("mac.taild17908.ts.net", ip))
+    {
+        Serial.print("Resolved to: ");
+        Serial.println(ip);
+    }
+    else
+    {
+        Serial.println("DNS failed");
+    }
+
+
 }
 
 void connectWebSocket()
 {
+        
     client.onMessage([](WebsocketsMessage message)
     {
         Serial.print("Received: ");
@@ -69,7 +85,7 @@ void connectWebSocket()
 
     Serial.print("Connecting to ");
     Serial.println(url);
-
+    client.setInsecure();
     bool ok = client.connect(url);
 
     if(!ok)
@@ -108,7 +124,7 @@ void loop()
     {
         Serial.println("Reconnecting WebSocket...");
 
-        delay(1000);
+        delay(5000);
 
         connectWebSocket();
     }
