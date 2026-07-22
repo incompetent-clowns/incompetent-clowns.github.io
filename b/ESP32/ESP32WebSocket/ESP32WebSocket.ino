@@ -71,7 +71,13 @@ void connectWiFi()
     "Sec-WebSocket-Version: 13\r\n"
     "\r\n");
 
+    delay(5000);
 
+    tcp.print(
+        "GET / HTTP/1.1\r\n"
+        "Host: mac.taild17908.ts.net\r\n"
+        "Connection: close\r\n"
+        "\r\n");    
     // tcp.setInsecure();
     // client.setClient(&tcp);
 
@@ -163,6 +169,11 @@ void loop()
     {
         // Serial.write(tcp.read());
         Serial.print(tcp.read());
+    }
+
+    if (!tcp.connected()) {
+        Serial.println("\nConnection closed.");
+        // break;
     }
 
     // if(!client.available())
