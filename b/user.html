@@ -27,6 +27,11 @@
         <h3>Remote</h3>
         <video id="remote" autoplay playsinline></video>
 
+        <h3>ESP32</h3>
+        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br/>
+        <textarea id="messageToESP32" rows="5" cols="60" placeholder="Message to ESP32"></textarea> <br />
+        <button id="btnESP32">Send to ESP32</button> <br/>
+
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
 
@@ -35,6 +40,8 @@
 
             statusEl = document.getElementById("regStatus");
             deviceIDEl = document.getElementById("deviceID");
+            messageToESP32El = document.getElementById("messageToESP32");
+            ESP32deviceIDEl = document.getElementById("ESP32deviceID");
 
             let socket;
             let pc;
@@ -114,6 +121,13 @@
                         statusEl.value = statusEl.value + `\nDone\n`;
                     }
                 };
+            }
+
+            document.getElementById("btnESP32").onclick = async () => {
+                const ESP32deviceID = ESP32deviceIDEl.value;
+                const messageToESP32 = messageToESP32El.value;
+                // const ESP32deviceIDEl
+                send({Type: "plain", to:ESP32deviceID, payload:messageToESP32});
             }
 
             document.getElementById("resetWebRTC").onclick = async () => {
