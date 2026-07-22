@@ -480,16 +480,6 @@ void printPublicKey()
     printHex(y, 32);
 }
 
-void signMessage(const String &msg)
-{
-    uint8_t hash[32];
-
-    mbedtls_sha256(
-        (const unsigned char *)msg.c_str(),
-        msg.length(),
-        hash,
-        0);
-
     // uint8_t sig[80];
     // size_t sigLen = 0;
 
@@ -502,6 +492,17 @@ void signMessage(const String &msg)
     //     &sigLen,
     //     mbedtls_ctr_drbg_random,
     //     &ctr);
+
+String signMessage(const String &msg)
+{
+    uint8_t hash[32];
+
+    mbedtls_sha256(
+        (const unsigned char *)msg.c_str(),
+        msg.length(),
+        hash,
+        0);
+
 
     uint8_t sig[80];
     size_t sigLen = 0;
@@ -520,7 +521,7 @@ void signMessage(const String &msg)
     if (ret != 0)
     {
         Serial.printf("Sign failed %d\n", ret);
-        return;
+        return String("Failed");
     }
 
     Serial.print("Signature (" );
@@ -528,6 +529,8 @@ void signMessage(const String &msg)
     Serial.println(" bytes):");
 
     printHex(sig, sigLen);
+    return String((char *)sig);
+    // return String((char *)b64);
 }
 
 
@@ -580,227 +583,6 @@ String getPublicKeySPKI()
         return String((char *)b64);
     }
 }
-// void printPublicKey_()
-// {
-//     mbedtls_pk_context pk;
-//     mbedtls_pk_init(&pk);
-
-//     int ret = mbedtls_pk_setup(
-//         &pk,
-//         mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
-
-//     if (ret != 0)
-//     {
-//         Serial.printf("pk_setup failed: %d\n", ret);
-//         return;
-//     }
-
-//     // Get the EC keypair inside the pk context
-//     mbedtls_ecp_keypair *ec = mbedtls_pk_ec(pk);
-
-//     // Copy our existing key into it
-//     mbedtls_ecp_group_copy(&ec->grp, &key.MBEDTLS_PRIVATE(grp));
-//     mbedtls_mpi_copy(&ec->d, &key.MBEDTLS_PRIVATE(d));
-//     mbedtls_ecp_copy(&ec->Q, &key.MBEDTLS_PRIVATE(Q));
-
-//     unsigned char der[128];
-
-//     ret = mbedtls_pk_write_pubkey_der(
-//         &pk,
-//         der,
-//         sizeof(der));
-
-//     if (ret < 0)
-//     {
-//         Serial.printf("write_pubkey_der failed: %d\n", ret);
-//         mbedtls_pk_free(&pk);
-//         return;
-//     }
-
-//     // DER is written at the END of the buffer.
-//     unsigned char *pub = der + sizeof(der) - ret;
-//     size_t pubLen = ret;
-
-//     Serial.printf("DER length = %u\n", (unsigned)pubLen);
-
-//     printHex(pub, pubLen);
-
-//     // Optional: Base64 encode for sending to Node.js
-//     unsigned char b64[256];
-//     size_t b64Len;
-
-//     mbedtls_base64_encode(
-//         b64,
-//         sizeof(b64),
-//         &b64Len,
-//         pub,
-//         pubLen);
-
-//     b64[b64Len] = '\0';
-
-//     Serial.println((char *)b64);
-
-//     mbedtls_pk_free(&pk);
-// }
-//-------------------
-
-//----------------------------
-// mbedtls_pk_context pk;
-// mbedtls_entropy_context entropy;
-// mbedtls_ctr_drbg_context ctr_drbg;
-
-// const char *KEY_FILE = "/ecdsa.pem";
-
-// bool initRandom()
-// {
-//     mbedtls_entropy_init(&entropy);
-//     mbedtls_ctr_drbg_init(&ctr_drbg);
-
-//     const char *pers = "esp32-ecdsa";
-
-//     int ret = mbedtls_ctr_drbg_seed(
-//         &ctr_drbg,
-//         mbedtls_entropy_func,
-//         &entropy,
-//         (const unsigned char *)pers,
-//         strlen(pers));
-
-//     return ret == 0;
-// }
-
-
-// bool generateKey()
-// {
-//     mbedtls_pk_init(&pk);
-
-//     int ret = mbedtls_pk_setup(
-//         &pk,
-//         mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
-
-//     if (ret != 0)
-//         return false;
-
-//     ret = mbedtls_ecp_gen_key(
-//         MBEDTLS_ECP_DP_SECP256R1,
-//         mbedtls_pk_ec(pk),
-//         mbedtls_ctr_drbg_random,
-//         &ctr_drbg);
-
-//     return ret == 0;
-// }
-
-
-// bool saveKey()
-// {
-//     unsigned char buffer[1600];
-
-//     int len = mbedtls_pk_write_key_pem(
-//         &pk,
-//         buffer,
-//         sizeof(buffer));
-
-//     if (len != 0)
-//         return false;
-
-//     File f = LittleFS.open(KEY_FILE, "w");
-//     if (!f)
-//         return false;
-
-//     f.print((char *)buffer);
-//     f.close();
-
-//     return true;
-// }
-
-// bool loadKey()
-// {
-//     if (!LittleFS.exists(KEY_FILE))
-//         return false;
-
-//     File f = LittleFS.open(KEY_FILE, "r");
-//     if (!f)
-//         return false;
-
-//     String pem = f.readString();
-
-//     f.close();
-
-//     mbedtls_pk_init(&pk);
-
-//     int ret = mbedtls_pk_parse_key(
-//         &pk,
-//         (const unsigned char *)pem.c_str(),
-//         pem.length() + 1,
-//         NULL,
-//         0,
-//         mbedtls_ctr_drbg_random,
-//         &ctr_drbg);
-
-//     return ret == 0;
-// }
-
-
-// void printPublicKey()
-// {
-//     unsigned char buffer[800];
-
-//     int ret = mbedtls_pk_write_pubkey_pem(
-//         &pk,
-//         buffer,
-//         sizeof(buffer));
-
-//     if (ret == 0)
-//     {
-//         Serial.println("Public key:");
-//         Serial.println((char *)buffer);
-//     }
-// }
-
-
-
-// void signMessage(const String &message)
-// {
-//     unsigned char hash[32];
-
-//     mbedtls_sha256(
-//         (const unsigned char *)message.c_str(),
-//         message.length(),
-//         hash,
-//         0);
-
-//     unsigned char signature[100];
-//     size_t sigLen = 0;
-
-//     int ret = mbedtls_pk_sign(
-//         &pk,
-//         MBEDTLS_MD_SHA256,
-//         hash,
-//         0,
-//         signature,
-//         &sigLen,
-//         mbedtls_ctr_drbg_random,
-//         &ctr_drbg);
-
-//     if (ret != 0)
-//     {
-//         Serial.println("Signing failed");
-//         return;
-//     }
-
-//     unsigned char base64[300];
-//     size_t outLen;
-
-//     mbedtls_base64_encode(
-//         base64,
-//         sizeof(base64),
-//         &outLen,
-//         signature,
-//         sigLen);
-
-//     Serial.println("Signature:");
-//     Serial.println((char *)base64);
-// }
-//---------------------------------
 
 
 ///////////////////////
@@ -842,7 +624,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     JsonObject device_ = response["device"].to<JsonObject>();
                     device_["publicKey"] = getPublicKeySPKI(); //"Working on it";
                     device_["id"] = "ESP32-1";
-                    device_["signature"] = str_challenge; //"Working on it";
+                    device_["signature"] = signMessage(str_challenge); //"Working on it";
                     device_["Type"] = "ESP32";
                     String str_response;
                     serializeJson(response,str_response);
