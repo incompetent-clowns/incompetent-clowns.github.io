@@ -59,8 +59,8 @@ void connectWiFi()
         Serial.println("TLS failed");
     }
 
-    tcp.setInsecure();
-    client.setClient(&tcp);
+    // tcp.setInsecure();
+    // client.setClient(&tcp);
 
 }
 
@@ -99,7 +99,8 @@ void connectWebSocket()
     String url =
         "wss://" +
         String(WS_HOST) +
-        ":443";
+        ":443/";
+        //":443";
         
         // "ws://" +
         // String(WS_PATH);
