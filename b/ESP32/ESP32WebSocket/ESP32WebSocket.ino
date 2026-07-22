@@ -372,7 +372,147 @@ void initRandom()
     }
 }
 
+void loadOrCreateKey()
+{
+    prefs.begin("crypto", false);
 
+    mbedtls_ecdsa_init(&key);
+
+    mbedtls_ecp_group_load(
+        &key.MBEDTLS_PRIVATE(grp),
+        MBEDTLS_ECP_DP_SECP256R1);
+
+    if (prefs.isKey("private"))
+    {
+        Serial.println("Loading existing key");
+
+        uint8_t d[32];
+
+        prefs.getBytes("private", d, 32);
+
+        mbedtls_mpi_read_binary(
+            &key.MBEDTLS_PRIVATE(d),
+            d,
+            32);
+
+        int ret = mbedtls_ecp_mul(
+            &key.MBEDTLS_PRIVATE(grp),
+            &key.MBEDTLS_PRIVATE(Q),
+            &key.MBEDTLS_PRIVATE(d),
+            &key.MBEDTLS_PRIVATE(grp).G,
+            mbedtls_ctr_drbg_random,
+            &ctr);
+
+        if (ret != 0)
+        {
+            Serial.printf("Public key rebuild failed %d\n", ret);
+            while (true)
+                delay(1000);
+        }
+    }
+    else
+    {
+        Serial.println("Generating new key");
+
+        int ret = mbedtls_ecdsa_genkey(
+            &key,
+            MBEDTLS_ECP_DP_SECP256R1,
+            mbedtls_ctr_drbg_random,
+            &ctr);
+
+        if (ret != 0)
+        {
+            Serial.printf("Key generation failed %d\n", ret);
+            while (true)
+                delay(1000);
+        }
+
+        uint8_t d[32];
+
+        mbedtls_mpi_write_binary(
+            &key.MBEDTLS_PRIVATE(d),
+            d,
+            32);
+
+        prefs.putBytes("private", d, 32);
+
+        Serial.println("Private key stored.");
+    }
+
+    prefs.end();
+}
+
+void printPublicKey()
+{
+    uint8_t x[32];
+    uint8_t y[32];
+
+    mbedtls_mpi_write_binary(
+        &key.MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(X),
+        x,
+        32);
+
+    mbedtls_mpi_write_binary(
+        &key.MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(Y),
+        y,
+        32);
+
+    Serial.println("Public X:");
+    printHex(x, 32);
+
+    Serial.println("Public Y:");
+    printHex(y, 32);
+}
+
+void signMessage(const String &msg)
+{
+    uint8_t hash[32];
+
+    mbedtls_sha256(
+        (const unsigned char *)msg.c_str(),
+        msg.length(),
+        hash,
+        0);
+
+    // uint8_t sig[80];
+    // size_t sigLen = 0;
+
+    // int ret = mbedtls_ecdsa_write_signature(
+    //     &key,
+    //     MBEDTLS_MD_SHA256,
+    //     hash,
+    //     sizeof(hash),
+    //     sig,
+    //     &sigLen,
+    //     mbedtls_ctr_drbg_random,
+    //     &ctr);
+
+    uint8_t sig[80];
+    size_t sigLen = 0;
+
+    int ret = mbedtls_ecdsa_write_signature(
+        &key,
+        MBEDTLS_MD_SHA256,
+        hash,
+        sizeof(hash),
+        sig,
+        sizeof(sig),
+        &sigLen,
+        mbedtls_ctr_drbg_random,
+        &ctr);
+
+    if (ret != 0)
+    {
+        Serial.printf("Sign failed %d\n", ret);
+        return;
+    }
+
+    Serial.print("Signature (" );
+    Serial.print(sigLen);
+    Serial.println(" bytes):");
+
+    printHex(sig, sigLen);
+}
 //-------------------
 
 //----------------------------
