@@ -690,21 +690,39 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 
         case WStype_TEXT:
             Serial.print("RX: ");
-            Serial.println((char *)payload);
-            
-            JsonDocument
-            JsonDocument response;
-            response["Type"] = "device";
-            JsonObject device_ = response["device"];
-            device_["publicKey"] = "Working on it";
-            device_["id"] = "ESP32-1";
-            device_["signature"] = "Working on it";
-            device_["Type"] = "ESP32";
-            String str_response;
-            seralizeJson(response,str_response);
-            ws.sendTXT(str_response);
-            // ws.sendTXT("{\"Type\":\"device\"}")
+            Serial.println((char *)payload);            
+            // JsonDocument request;
+            // DeserializationError err = deserializeJson(request, payload);
+
+            // if (err)
+            // {
+            //     Serial.println("Invalid JSON");
+            //     return;
+            // }            
+            //If Json request, 
+            // if(!err){
+            if(1){
+                // if(request["Type"]=="auth"){
+                    // JsonObject payload_ = request["payload"];
+
+                    // String str_challenge = payload_["challenge"];
+
+                    // JsonDocument
+                    JsonDocument response;
+                    response["Type"] = "device";
+                    JsonObject device_ = response["device"];
+                    device_["publicKey"] = "Working on it";
+                    device_["id"] = "ESP32-1";
+                    device_["signature"] = "Working on it";
+                    device_["Type"] = "ESP32";
+                    String str_response;
+                    serializeJson(response,str_response);
+                    ws.sendTXT(str_response);
+                // }
+            }
             break;
+
+            // ws.sendTXT("{\"Type\":\"device\"}")
 
         case WStype_DISCONNECTED:
             Serial.println("Disconnected");
