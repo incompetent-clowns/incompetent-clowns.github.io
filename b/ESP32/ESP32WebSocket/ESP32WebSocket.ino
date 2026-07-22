@@ -703,11 +703,13 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             //If Json request, 
             // if(!err){
             // if(1){
-            if(deserializeJson(request,(char *)payload)){
-                // if(request["Type"]=="auth"){
-                    // JsonObject payload_ = request["payload"];
+            if(!deserializeJson(request,(char *)payload)){
+                // Serial.println(request["Type"]);
+                if(request["Type"]=="auth"){
+                    Serial.println("Authentication requested by the server.");
+                    JsonObject payload_ = request["payload"];
 
-                    // String str_challenge = payload_["challenge"];
+                    String str_challenge = payload_["challenge"];
 
                     // JsonDocument
                     JsonDocument response;
@@ -715,12 +717,13 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     JsonObject device_ = response["device"];
                     device_["publicKey"] = "Working on it";
                     device_["id"] = "ESP32-1";
-                    device_["signature"] = "Working on it";
+                    device_["signature"] = str_challenge; //"Working on it";
                     device_["Type"] = "ESP32";
                     String str_response;
                     serializeJson(response,str_response);
+                    Serial.println("Sending:" + str_response);
                     ws.sendTXT(str_response);
-                // }
+                }
             }
             break;}
 
@@ -730,12 +733,12 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             Serial.println("Disconnected");
             break;}
 
-        case WStype_ERROR:
+        case WStype_ERROR:{
             Serial.println("WebSocket error");
-            break;
+            break;}
 
-        default:
-            break;
+        default:{
+            break;}
     }
 }
 
