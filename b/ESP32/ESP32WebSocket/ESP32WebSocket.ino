@@ -93,7 +93,7 @@ void setup()
 
 void loop()
 {
-    Serial.println("Glaba loop!");
+    // Serial.println("Glaba loop!");
     client.poll();
 
     if(WiFi.status() != WL_CONNECTED)
