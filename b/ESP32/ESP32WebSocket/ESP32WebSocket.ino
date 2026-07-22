@@ -302,14 +302,22 @@
 
 ////////////////////////// TRYING TO ADD THE CRYPTO PART
 
-#include <LittleFS.h>
+// #include <LittleFS.h>
 
-#include "mbedtls/pk.h"
-#include "mbedtls/ecp.h"
+// #include "mbedtls/pk.h"
+// #include "mbedtls/ecp.h"
+// #include "mbedtls/ecdsa.h"
+// #include "mbedtls/ctr_drbg.h"
+// #include "mbedtls/entropy.h"
+// #include "mbedtls/base64.h"
+// #include "mbedtls/sha256.h"
+
+#include <Preferences.h>
+
 #include "mbedtls/ecdsa.h"
+#include "mbedtls/ecp.h"
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
-#include "mbedtls/base64.h"
 #include "mbedtls/sha256.h"
 
 ////////////////////////
@@ -322,162 +330,207 @@ WebSocketsClient ws;
 ///////////////////////////
 
 
-//----------------------------
-mbedtls_pk_context pk;
+
+//--------------------
+Preferences prefs;
+
+mbedtls_ecdsa_context key;
 mbedtls_entropy_context entropy;
-mbedtls_ctr_drbg_context ctr_drbg;
+mbedtls_ctr_drbg_context ctr;
 
-const char *KEY_FILE = "/ecdsa.pem";
 
-bool initRandom()
+void printHex(const uint8_t *data, size_t len)
+{
+    for (size_t i = 0; i < len; i++)
+    {
+        if (data[i] < 16)
+            Serial.print("0");
+        Serial.print(data[i], HEX);
+    }
+    Serial.println();
+}
+
+void initRandom()
 {
     mbedtls_entropy_init(&entropy);
-    mbedtls_ctr_drbg_init(&ctr_drbg);
+    mbedtls_ctr_drbg_init(&ctr);
 
-    const char *pers = "esp32-ecdsa";
+    const char *pers = "ecdsa";
 
     int ret = mbedtls_ctr_drbg_seed(
-        &ctr_drbg,
+        &ctr,
         mbedtls_entropy_func,
         &entropy,
         (const unsigned char *)pers,
         strlen(pers));
 
-    return ret == 0;
-}
-
-
-bool generateKey()
-{
-    mbedtls_pk_init(&pk);
-
-    int ret = mbedtls_pk_setup(
-        &pk,
-        mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
-
     if (ret != 0)
-        return false;
-
-    ret = mbedtls_ecp_gen_key(
-        MBEDTLS_ECP_DP_SECP256R1,
-        mbedtls_pk_ec(pk),
-        mbedtls_ctr_drbg_random,
-        &ctr_drbg);
-
-    return ret == 0;
-}
-
-
-bool saveKey()
-{
-    unsigned char buffer[1600];
-
-    int len = mbedtls_pk_write_key_pem(
-        &pk,
-        buffer,
-        sizeof(buffer));
-
-    if (len != 0)
-        return false;
-
-    File f = LittleFS.open(KEY_FILE, "w");
-    if (!f)
-        return false;
-
-    f.print((char *)buffer);
-    f.close();
-
-    return true;
-}
-
-bool loadKey()
-{
-    if (!LittleFS.exists(KEY_FILE))
-        return false;
-
-    File f = LittleFS.open(KEY_FILE, "r");
-    if (!f)
-        return false;
-
-    String pem = f.readString();
-
-    f.close();
-
-    mbedtls_pk_init(&pk);
-
-    int ret = mbedtls_pk_parse_key(
-        &pk,
-        (const unsigned char *)pem.c_str(),
-        pem.length() + 1,
-        NULL,
-        0,
-        mbedtls_ctr_drbg_random,
-        &ctr_drbg);
-
-    return ret == 0;
-}
-
-
-void printPublicKey()
-{
-    unsigned char buffer[800];
-
-    int ret = mbedtls_pk_write_pubkey_pem(
-        &pk,
-        buffer,
-        sizeof(buffer));
-
-    if (ret == 0)
     {
-        Serial.println("Public key:");
-        Serial.println((char *)buffer);
+        Serial.printf("RNG init failed: %d\n", ret);
+        while (true)
+            delay(1000);
     }
 }
 
 
+//-------------------
 
-void signMessage(const String &message)
-{
-    unsigned char hash[32];
+//----------------------------
+// mbedtls_pk_context pk;
+// mbedtls_entropy_context entropy;
+// mbedtls_ctr_drbg_context ctr_drbg;
 
-    mbedtls_sha256(
-        (const unsigned char *)message.c_str(),
-        message.length(),
-        hash,
-        0);
+// const char *KEY_FILE = "/ecdsa.pem";
 
-    unsigned char signature[100];
-    size_t sigLen = 0;
+// bool initRandom()
+// {
+//     mbedtls_entropy_init(&entropy);
+//     mbedtls_ctr_drbg_init(&ctr_drbg);
 
-    int ret = mbedtls_pk_sign(
-        &pk,
-        MBEDTLS_MD_SHA256,
-        hash,
-        0,
-        signature,
-        &sigLen,
-        mbedtls_ctr_drbg_random,
-        &ctr_drbg);
+//     const char *pers = "esp32-ecdsa";
 
-    if (ret != 0)
-    {
-        Serial.println("Signing failed");
-        return;
-    }
+//     int ret = mbedtls_ctr_drbg_seed(
+//         &ctr_drbg,
+//         mbedtls_entropy_func,
+//         &entropy,
+//         (const unsigned char *)pers,
+//         strlen(pers));
 
-    unsigned char base64[300];
-    size_t outLen;
+//     return ret == 0;
+// }
 
-    mbedtls_base64_encode(
-        base64,
-        sizeof(base64),
-        &outLen,
-        signature,
-        sigLen);
 
-    Serial.println("Signature:");
-    Serial.println((char *)base64);
-}
+// bool generateKey()
+// {
+//     mbedtls_pk_init(&pk);
+
+//     int ret = mbedtls_pk_setup(
+//         &pk,
+//         mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+
+//     if (ret != 0)
+//         return false;
+
+//     ret = mbedtls_ecp_gen_key(
+//         MBEDTLS_ECP_DP_SECP256R1,
+//         mbedtls_pk_ec(pk),
+//         mbedtls_ctr_drbg_random,
+//         &ctr_drbg);
+
+//     return ret == 0;
+// }
+
+
+// bool saveKey()
+// {
+//     unsigned char buffer[1600];
+
+//     int len = mbedtls_pk_write_key_pem(
+//         &pk,
+//         buffer,
+//         sizeof(buffer));
+
+//     if (len != 0)
+//         return false;
+
+//     File f = LittleFS.open(KEY_FILE, "w");
+//     if (!f)
+//         return false;
+
+//     f.print((char *)buffer);
+//     f.close();
+
+//     return true;
+// }
+
+// bool loadKey()
+// {
+//     if (!LittleFS.exists(KEY_FILE))
+//         return false;
+
+//     File f = LittleFS.open(KEY_FILE, "r");
+//     if (!f)
+//         return false;
+
+//     String pem = f.readString();
+
+//     f.close();
+
+//     mbedtls_pk_init(&pk);
+
+//     int ret = mbedtls_pk_parse_key(
+//         &pk,
+//         (const unsigned char *)pem.c_str(),
+//         pem.length() + 1,
+//         NULL,
+//         0,
+//         mbedtls_ctr_drbg_random,
+//         &ctr_drbg);
+
+//     return ret == 0;
+// }
+
+
+// void printPublicKey()
+// {
+//     unsigned char buffer[800];
+
+//     int ret = mbedtls_pk_write_pubkey_pem(
+//         &pk,
+//         buffer,
+//         sizeof(buffer));
+
+//     if (ret == 0)
+//     {
+//         Serial.println("Public key:");
+//         Serial.println((char *)buffer);
+//     }
+// }
+
+
+
+// void signMessage(const String &message)
+// {
+//     unsigned char hash[32];
+
+//     mbedtls_sha256(
+//         (const unsigned char *)message.c_str(),
+//         message.length(),
+//         hash,
+//         0);
+
+//     unsigned char signature[100];
+//     size_t sigLen = 0;
+
+//     int ret = mbedtls_pk_sign(
+//         &pk,
+//         MBEDTLS_MD_SHA256,
+//         hash,
+//         0,
+//         signature,
+//         &sigLen,
+//         mbedtls_ctr_drbg_random,
+//         &ctr_drbg);
+
+//     if (ret != 0)
+//     {
+//         Serial.println("Signing failed");
+//         return;
+//     }
+
+//     unsigned char base64[300];
+//     size_t outLen;
+
+//     mbedtls_base64_encode(
+//         base64,
+//         sizeof(base64),
+//         &outLen,
+//         signature,
+//         sigLen);
+
+//     Serial.println("Signature:");
+//     Serial.println((char *)base64);
+// }
 //---------------------------------
 
 
@@ -525,21 +578,21 @@ void setup()
     Serial.println("\nWiFi connected.");
 
 //////-------------------v
-    LittleFS.begin();
-    initRandom();
+    // LittleFS.begin();
+    // initRandom();
 
-    if (!loadKey())
-    {
-        Serial.println("Generating new key...");
-        generateKey();
-        saveKey();
-    }
-    else
-    {
-        Serial.println("Loaded existing key.");
-    }    
+    // if (!loadKey())
+    // {
+    //     Serial.println("Generating new key...");
+    //     generateKey();
+    //     saveKey();
+    // }
+    // else
+    // {
+    //     Serial.println("Loaded existing key.");
+    // }    
 
-    printPublicKey();
+    // printPublicKey();
 
 //////------------------------^
 
