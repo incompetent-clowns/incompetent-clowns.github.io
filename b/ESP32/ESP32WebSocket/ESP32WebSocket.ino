@@ -683,15 +683,16 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 {
     switch (type)
     {
-        case WStype_CONNECTED:
+        case WStype_CONNECTED:{
             Serial.println("Connected!");
             // ws.sendTXT("Hello from ESP32");
-            break;
+            break;}
 
-        case WStype_TEXT:
+        case WStype_TEXT:{
             Serial.print("RX: ");
             Serial.println((char *)payload);            
-            // JsonDocument request;
+            JsonDocument request;
+            // deserializeJson(request,payload);
             // DeserializationError err = deserializeJson(request, payload);
 
             // if (err)
@@ -701,7 +702,8 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             // }            
             //If Json request, 
             // if(!err){
-            if(1){
+            // if(1){
+            if(deserializeJson(request,(char *)payload)){
                 // if(request["Type"]=="auth"){
                     // JsonObject payload_ = request["payload"];
 
@@ -720,13 +722,13 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     ws.sendTXT(str_response);
                 // }
             }
-            break;
+            break;}
 
             // ws.sendTXT("{\"Type\":\"device\"}")
 
-        case WStype_DISCONNECTED:
+        case WStype_DISCONNECTED:{
             Serial.println("Disconnected");
-            break;
+            break;}
 
         case WStype_ERROR:
             Serial.println("WebSocket error");
