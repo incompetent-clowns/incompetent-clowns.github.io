@@ -681,12 +681,13 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
     {
         case WStype_CONNECTED:
             Serial.println("Connected!");
-            ws.sendTXT("Hello from ESP32");
+            // ws.sendTXT("Hello from ESP32");
             break;
 
         case WStype_TEXT:
             Serial.print("RX: ");
             Serial.println((char *)payload);
+            ws.sendTXT("{\"Type\":\"device\"}")
             break;
 
         case WStype_DISCONNECTED:
@@ -716,6 +717,16 @@ void setup()
     }
 
     Serial.println("\nWiFi connected.");
+///////---------------------v
+    initRandom();
+
+    loadOrCreateKey();
+
+    printPublicKey();
+
+    signMessage("Hello World");
+///////---------------------^
+
 
 //////-------------------v
     // LittleFS.begin();
