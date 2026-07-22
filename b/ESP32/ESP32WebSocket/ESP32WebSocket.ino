@@ -330,6 +330,10 @@ WebSocketsClient ws;
 ///////////////////////////
 
 
+//################
+#include <ArduinoJson.h>
+//################
+
 
 //--------------------
 Preferences prefs;
@@ -687,7 +691,19 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
         case WStype_TEXT:
             Serial.print("RX: ");
             Serial.println((char *)payload);
-            ws.sendTXT("{\"Type\":\"device\"}")
+            
+            JsonDocument
+            JsonDocument response;
+            response["Type"] = "device";
+            JsonObject device_ = response["device"];
+            device_["publicKey"] = "Working on it";
+            device_["id"] = "ESP32-1";
+            device_["signature"] = "Working on it";
+            device_["Type"] = "ESP32";
+            String str_response;
+            seralizeJson(response,str_response);
+            ws.sendTXT(str_response);
+            // ws.sendTXT("{\"Type\":\"device\"}")
             break;
 
         case WStype_DISCONNECTED:
