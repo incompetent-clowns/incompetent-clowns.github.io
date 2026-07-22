@@ -493,7 +493,7 @@ void printPublicKey()
     //     mbedtls_ctr_drbg_random,
     //     &ctr);
 
-String signMessage(const String &msg)
+String signMessage_(const String &msg)
 {
     uint8_t hash[32];
 
@@ -533,6 +533,75 @@ String signMessage(const String &msg)
     // return String((char *)b64);
 }
 
+String signMessage(const String &msg)
+{
+    // Compute SHA-256 hash of the message
+    uint8_t hash[32];
+
+    mbedtls_sha256(
+        reinterpret_cast<const unsigned char *>(msg.c_str()),
+        msg.length(),
+        hash,
+        0);
+
+    // r and s components of the signature
+    mbedtls_mpi r, s;
+    mbedtls_mpi_init(&r);
+    mbedtls_mpi_init(&s);
+
+    int ret = mbedtls_ecdsa_sign(
+        &key.MBEDTLS_PRIVATE(grp),
+        &r,
+        &s,
+        &key.MBEDTLS_PRIVATE(d),
+        hash,
+        sizeof(hash),
+        mbedtls_ctr_drbg_random,
+        &ctr);
+
+    if (ret != 0)
+    {
+        Serial.printf("Sign failed: %d\n", ret);
+
+        mbedtls_mpi_free(&r);
+        mbedtls_mpi_free(&s);
+
+        return "";
+    }
+
+    // IEEE P1363 format = r || s
+    uint8_t sig[64];
+
+    mbedtls_mpi_write_binary(&r, sig, 32);
+    mbedtls_mpi_write_binary(&s, sig + 32, 32);
+
+    mbedtls_mpi_free(&r);
+    mbedtls_mpi_free(&s);
+
+    Serial.println("Signature (IEEE P1363):");
+    printHex(sig, sizeof(sig));
+
+    // Base64 encode the binary signature
+    unsigned char b64[128];
+    size_t b64Len = 0;
+
+    ret = mbedtls_base64_encode(
+        b64,
+        sizeof(b64),
+        &b64Len,
+        sig,
+        sizeof(sig));
+
+    if (ret != 0)
+    {
+        Serial.println("Base64 encoding failed.");
+        return "";
+    }
+
+    b64[b64Len] = '\0';
+
+    return String(reinterpret_cast<char *>(b64));
+}
 
 String getPublicKeySPKI()
 {
