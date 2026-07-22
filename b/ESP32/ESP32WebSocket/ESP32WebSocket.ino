@@ -8,7 +8,7 @@
 // using namespace websockets;
 
 // WebsocketsClient client;
-WiFiClientSecure tcp;
+WiFiClient tcp;
 
 // WebsocketsClient client;
 
@@ -50,7 +50,7 @@ void connectWiFi()
 
     // WiFiClientSecure Wclient;
 
-    tcp.setInsecure();
+    // tcp.setInsecure();
 
     if (tcp.connect("mac.taild17908.ts.net", 443))
     {
@@ -60,6 +60,17 @@ void connectWiFi()
     {
         Serial.println("TLS failed");
     }
+
+    Serial.println("Trying to upgrade manually");
+    tcp.print(
+    "GET / HTTP/1.1\r\n"
+    "Host: mac.taild17908.ts.net\r\n"
+    "Upgrade: websocket\r\n"
+    "Connection: Upgrade\r\n"
+    "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+    "Sec-WebSocket-Version: 13\r\n"
+    "\r\n");
+
 
     // tcp.setInsecure();
     // client.setClient(&tcp);
@@ -145,6 +156,13 @@ void loop()
 
         WiFi.disconnect();
         connectWiFi();
+    }
+
+
+    while (tcp.available())
+    {
+        // Serial.write(tcp.read());
+        Serial.print(tcp.read());
     }
 
     // if(!client.available())
