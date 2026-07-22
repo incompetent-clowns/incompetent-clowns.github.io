@@ -6,6 +6,11 @@
 using namespace websockets;
 
 WebsocketsClient client;
+WiFiClientSecure tcp;
+
+// WebsocketsClient client;
+
+
 
 void connectWiFi()
 {
@@ -33,12 +38,29 @@ void connectWiFi()
     {
         Serial.print("Resolved to: ");
         Serial.println(ip);
+        Serial.println("DNS works");
     }
     else
     {
         Serial.println("DNS failed");
     }
 
+
+    // WiFiClientSecure Wclient;
+
+    tcp.setInsecure();
+
+    if (tcp.connect("mac.taild17908.ts.net", 443))
+    {
+        Serial.println("TLS works");
+    }
+    else
+    {
+        Serial.println("TLS failed");
+    }
+
+    tcp.setInsecure();
+    client.setClient(&tcp);
 
 }
 
