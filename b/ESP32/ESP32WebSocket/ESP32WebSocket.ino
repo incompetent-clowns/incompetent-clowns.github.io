@@ -76,8 +76,9 @@ void connectWebSocket()
 
     String url =
         "wss://" +
-        String(WS_HOST);
-        //+
+        String(WS_HOST) +
+        ":443";
+        
         // "ws://" +
         // String(WS_PATH);
         // ":" +
@@ -85,8 +86,9 @@ void connectWebSocket()
 
     Serial.print("Connecting to ");
     Serial.println(url);
-    client.setInsecure();
-    bool ok = client.connect(url);
+
+    // client.setInsecure();
+    bool ok = client.connect(url); //,443);
 
     if(!ok)
     {

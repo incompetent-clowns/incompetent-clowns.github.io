@@ -9,7 +9,7 @@ constexpr char WIFI_PASSWORD[] = "air81588";
 
 // WebSocket server
 // constexpr char WS_HOST[] = "192.168.1.100";
-constexpr char WS_HOST[] = "mac.taild17908.ts.net/";
+constexpr char WS_HOST[] = "mac.taild17908.ts.net";
 // constexpr char WS_HOST[] = "example.com";
 
 // constexpr uint16_t WS_PORT = 8080;
