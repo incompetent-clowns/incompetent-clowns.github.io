@@ -319,7 +319,19 @@
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/sha256.h"
-
+#include "mbedtls/base64.h"
+static const uint8_t SPKI_PREFIX[] = {
+    0x30, 0x59,             // SEQUENCE (89 bytes)
+    0x30, 0x13,             // SEQUENCE (19 bytes)
+    0x06, 0x07,             // OID (7 bytes)
+    0x2A, 0x86, 0x48, 0xCE,
+    0x3D, 0x02, 0x01,       // id-ecPublicKey
+    0x06, 0x08,             // OID (8 bytes)
+    0x2A, 0x86, 0x48, 0xCE,
+    0x3D, 0x03, 0x01, 0x07, // prime256v1 (P-256)
+    0x03, 0x42,             // BIT STRING (66 bytes)
+    0x00                    // 0 unused bits
+};
 ////////////////////////
 #include <WiFi.h>
 #include <WebSocketsClient.h>
@@ -519,69 +531,117 @@ void signMessage(const String &msg)
 }
 
 
-
-void printPublicKey_()
+String getPublicKeySPKI()
 {
-    mbedtls_pk_context pk;
-    mbedtls_pk_init(&pk);
+    uint8_t x[32];
+    uint8_t y[32];
 
-    int ret = mbedtls_pk_setup(
-        &pk,
-        mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+    mbedtls_mpi_write_binary(
+        &key.MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(X),
+        x,
+        sizeof(x));
 
-    if (ret != 0)
-    {
-        Serial.printf("pk_setup failed: %d\n", ret);
-        return;
-    }
+    mbedtls_mpi_write_binary(
+        &key.MBEDTLS_PRIVATE(Q).MBEDTLS_PRIVATE(Y),
+        y,
+        sizeof(y));
 
-    // Get the EC keypair inside the pk context
-    mbedtls_ecp_keypair *ec = mbedtls_pk_ec(pk);
+    uint8_t der[91];
 
-    // Copy our existing key into it
-    mbedtls_ecp_group_copy(&ec->grp, &key.MBEDTLS_PRIVATE(grp));
-    mbedtls_mpi_copy(&ec->d, &key.MBEDTLS_PRIVATE(d));
-    mbedtls_ecp_copy(&ec->Q, &key.MBEDTLS_PRIVATE(Q));
+    // Fixed SPKI header
+    memcpy(der, SPKI_PREFIX, sizeof(SPKI_PREFIX));
 
-    unsigned char der[128];
+    // Uncompressed EC point
+    der[26] = 0x04;
 
-    ret = mbedtls_pk_write_pubkey_der(
-        &pk,
-        der,
-        sizeof(der));
+    memcpy(der + 27, x, 32);
+    memcpy(der + 59, y, 32);
 
-    if (ret < 0)
-    {
-        Serial.printf("write_pubkey_der failed: %d\n", ret);
-        mbedtls_pk_free(&pk);
-        return;
-    }
+    // Optional: print DER as hex
+    Serial.println("SPKI DER:");
+    printHex(der, sizeof(der));
 
-    // DER is written at the END of the buffer.
-    unsigned char *pub = der + sizeof(der) - ret;
-    size_t pubLen = ret;
+    // Base64 encode for transmission
+    unsigned char b64[128];
+    size_t b64Len = 0;
 
-    Serial.printf("DER length = %u\n", (unsigned)pubLen);
-
-    printHex(pub, pubLen);
-
-    // Optional: Base64 encode for sending to Node.js
-    unsigned char b64[256];
-    size_t b64Len;
-
-    mbedtls_base64_encode(
+    int ret = mbedtls_base64_encode(
         b64,
         sizeof(b64),
         &b64Len,
-        pub,
-        pubLen);
+        der,
+        sizeof(der));
 
-    b64[b64Len] = '\0';
-
-    Serial.println((char *)b64);
-
-    mbedtls_pk_free(&pk);
+    if (ret == 0)
+    {
+        b64[b64Len] = '\0';
+        Serial.println("SPKI Base64:");
+        Serial.println((char *)b64);
+        return String((char *)b64);
+    }
 }
+// void printPublicKey_()
+// {
+//     mbedtls_pk_context pk;
+//     mbedtls_pk_init(&pk);
+
+//     int ret = mbedtls_pk_setup(
+//         &pk,
+//         mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY));
+
+//     if (ret != 0)
+//     {
+//         Serial.printf("pk_setup failed: %d\n", ret);
+//         return;
+//     }
+
+//     // Get the EC keypair inside the pk context
+//     mbedtls_ecp_keypair *ec = mbedtls_pk_ec(pk);
+
+//     // Copy our existing key into it
+//     mbedtls_ecp_group_copy(&ec->grp, &key.MBEDTLS_PRIVATE(grp));
+//     mbedtls_mpi_copy(&ec->d, &key.MBEDTLS_PRIVATE(d));
+//     mbedtls_ecp_copy(&ec->Q, &key.MBEDTLS_PRIVATE(Q));
+
+//     unsigned char der[128];
+
+//     ret = mbedtls_pk_write_pubkey_der(
+//         &pk,
+//         der,
+//         sizeof(der));
+
+//     if (ret < 0)
+//     {
+//         Serial.printf("write_pubkey_der failed: %d\n", ret);
+//         mbedtls_pk_free(&pk);
+//         return;
+//     }
+
+//     // DER is written at the END of the buffer.
+//     unsigned char *pub = der + sizeof(der) - ret;
+//     size_t pubLen = ret;
+
+//     Serial.printf("DER length = %u\n", (unsigned)pubLen);
+
+//     printHex(pub, pubLen);
+
+//     // Optional: Base64 encode for sending to Node.js
+//     unsigned char b64[256];
+//     size_t b64Len;
+
+//     mbedtls_base64_encode(
+//         b64,
+//         sizeof(b64),
+//         &b64Len,
+//         pub,
+//         pubLen);
+
+//     b64[b64Len] = '\0';
+
+//     Serial.println((char *)b64);
+
+//     mbedtls_pk_free(&pk);
+// }
 //-------------------
 
 //----------------------------
@@ -780,7 +840,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     JsonDocument response;
                     response["Type"] = "device";
                     JsonObject device_ = response["device"].to<JsonObject>();
-                    device_["publicKey"] = "Working on it";
+                    device_["publicKey"] = getPublicKeySPKI(); //"Working on it";
                     device_["id"] = "ESP32-1";
                     device_["signature"] = str_challenge; //"Working on it";
                     device_["Type"] = "ESP32";
