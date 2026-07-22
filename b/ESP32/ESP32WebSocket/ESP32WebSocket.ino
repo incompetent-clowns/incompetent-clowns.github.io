@@ -63,15 +63,15 @@ void connectWiFi()
         Serial.println("TLS failed");
     }
 
-    // Serial.println("Trying to upgrade manually");
-    // tcp.print(
-    // "GET / HTTP/1.1\r\n"
-    // "Host: mac.taild17908.ts.net\r\n"
-    // "Upgrade: websocket\r\n"
-    // "Connection: Upgrade\r\n"
-    // "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
-    // "Sec-WebSocket-Version: 13\r\n"
-    // "\r\n");
+    Serial.println("Trying to upgrade manually");
+    tcp.print(
+    "GET / HTTP/1.1\r\n"
+    "Host: mac.taild17908.ts.net\r\n"
+    "Upgrade: websocket\r\n"
+    "Connection: Upgrade\r\n"
+    "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n"
+    "Sec-WebSocket-Version: 13\r\n"
+    "\r\n");
 
 
 
@@ -146,7 +146,7 @@ void connectWebSocket()
     Serial.print("Connecting to ");
     Serial.println(url);
 
-    // client.setInsecure();
+    client.setInsecure();
     bool ok = client.connect(url); //,443);
 
     if(!ok)
@@ -218,3 +218,12 @@ void loop()
 
     delay(1000);
 }
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
