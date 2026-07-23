@@ -364,7 +364,46 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     ws.sendTXT(str_response);
                 }
 
-                if
+                if(request["Type"] == "cmd"){
+                    Serial.println("Command sent by user.");
+                    JsonDocument payload_ = response["payload"]; //.to<JsonObject>();
+                    if (payload_["dir"]=="right"){
+                        if(payload_["isPressed"]){
+                            Serial.println("Moving right");
+                        }
+                        else{
+                            Serial.println("Stop moving right");
+                        }
+                    }
+                    if (payload_["dir"]=="left"){
+                        if(payload_["isPressed"]){
+                            Serial.println("Moving left");
+                        }
+                        else{
+                            Serial.println("Stop moving left");
+                        }
+
+                    }
+                    if (payload_["dir"]=="up"){
+                        if(payload_["isPressed"]){
+                            Serial.println("Moving up");
+                        }
+                        else{
+                            Serial.println("Stop moving up");
+                        }
+
+                    }
+                    if (payload_["dir"]=="down"){
+                        if(payload_["isPressed"]){
+                            Serial.println("Moving down");
+                        }
+                        else{
+                            Serial.println("Stop moving down");
+                        }
+
+                    }
+
+                }
             }
             break;}
 
