@@ -707,6 +707,14 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 
         case WStype_DISCONNECTED:{
             Serial.println("Disconnected");
+            Serial.println("Trying to reconnect.");
+            ws.beginSSL(
+                "mac.taild17908.ts.net",
+                443,
+                "/",
+                ""          // <-- disable "arduino" subprotocol
+            );
+
             break;}
 
         case WStype_ERROR:{
