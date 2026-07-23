@@ -204,54 +204,12 @@
         signatureEl = document.getElementById("signature");
         signNowEl = document.getElementById("signNow");
 
-        // signNowEl.addEventListener("click", () => {
-        //     crypto.subtle.sign(
-        //         {
-        //             name: "ECDSA",
-        //             hash: "SHA-256"
-        //         },
-        //         keyPair.privateKey,
-        //         data
-        //     ).then(signatureBuffer => {
-        //         signatureEl.textContent = signatureBuffer;
-        //     });
-        // });
-        // () => {
-        //     signatureEl.textContent = "glab";
-        // });
-
-        // signNowEl.addEventListener("click", async () => {
-        //     message = messageToSignEl.textContent;
-        //     const encoder = new TextEncoder();
-        //     const data = encoder.encode(message);
-
-        //     const signatureBuffer = await crypto.subtle.sign(
-        //         {
-        //             name: "ECDSA",
-        //             hash: "SHA-256"
-        //         },
-        //         keyPair.privateKey,
-        //         data
-        //     ) //called buffer because it is not formatted properly
-        //     signatureEl.textContent = toBase64(signatureBuffer); //need to format before assigning
-        // });
+        
 
         signNowEl.addEventListener("click", () => {
             signMessage(messageToSignEl.textContent, keyPair).then(
                 res => { signatureEl.textContent = res }
             );
-            // const encoder = new TextEncoder();
-            // const data = encoder.encode(message);
-
-            // const signatureBuffer = await crypto.subtle.sign(
-            //     {
-            //         name: "ECDSA",
-            //         hash: "SHA-256"
-            //     },
-            //     keyPair.privateKey,
-            //     data
-            // ) //called buffer because it is not formatted properly
-            // signatureEl.textContent = toBase64(signatureBuffer); //need to format before assigning
         });
 
 
@@ -259,22 +217,18 @@
     </script>
 
 
-    <!-- 
-    <h4>Authenticate</h4>
-    <p>
-
-    </p> 
-    -->
-
-    <h4>Authenticate the device</h4>
+    <h4>Authentication Settings</h4>
     <p>The page will remember your settings so you need only input them once.</p>
     <textarea id="serverURL" rows="1" cols="60" placeholder="Server URL (default wss://mac.taild17908.ts.net/)"
         default="mac...">wss://mac.taild17908.ts.net/</textarea> <br />
     <!-- <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br /> -->
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use cam1)">cam1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
-    <button id="authenticateNow">Authenticate Now</button><br /><br />
+    <button id="authenticateNow">Reconnect</button><br /><br />
     <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
+    
+    <button id="disconnect">Disconnect Call</button>
+
     <h3>Local</h3>
     <video id="local" autoplay muted playsinline></video>
 
@@ -317,7 +271,7 @@
         //     const result = await a_signMessage(0,0);
         // });
 
-
+        
         async function connect(event){
 
             localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
@@ -398,13 +352,24 @@
             };
 
             
+
             //TODO: add a reconnect loop if the ws connection drops
             ws.onclose = async function (msg) {
-                connect()
+                connect();
+                
             }        
         }
 
         authenticateNowEl.addEventListener("click", (event) => connect(event));        
+        document.getElementById("disconnect").addEventListener("click", async () => {
+            try{
+                await pc.close();
+                log("Disconnected.")
+            }
+            catch{
+                log("Not on a call.")
+            }
+        });
 
         connect();
         // document.window.onload(connect);
