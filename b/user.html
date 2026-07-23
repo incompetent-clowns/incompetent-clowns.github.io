@@ -220,6 +220,8 @@
                     await pc.close();
                     pc = null;
                     log("Killed the peer connection object.");
+                    await delay(3000);
+
                     const deviceID = deviceIDEl.value;
                     send({ Type: "resetWebRTC", to: deviceID });
                     log("Requested the remote client to do the same.");
@@ -277,6 +279,10 @@
                         send({ type: "ice", to: currentPeer(), candidate: e.candidate });
                     }
                 };
+            }
+
+            function log(str) {
+                statusEl.value = statusEl.value + str;
             }
 
         </script>
