@@ -42,10 +42,14 @@ mbedtls_ctr_drbg_context ctr;
 
 
 ///// MOTOR
-const int in1 = 26;
-const int in2 = 25;
-const int in3 = 33;
-const int in4 = 32;
+// const int in1 = 26;
+// const int in2 = 25;
+// const int in3 = 33;
+// const int in4 = 32;
+const int in1 = 4;
+const int in2 = 5;
+const int in3 = 6;
+const int in4 = 7;
 
 
 void printHex(const uint8_t *data, size_t len)
@@ -489,13 +493,14 @@ void setup()
     signMessage("Hello World");
 ///////---------------------^
 
-    Serial.println("Initialising motor pins");
+    Serial.println("Initialising motor pins.");
     // Set motor pins as output
     pinMode(in1, OUTPUT);
     pinMode(in2, OUTPUT);
     pinMode(in3, OUTPUT);
     pinMode(in4, OUTPUT);
 
+    Serial.println("Motor pins configured.")
 
 
 
