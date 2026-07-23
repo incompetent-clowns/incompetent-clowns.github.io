@@ -371,6 +371,14 @@
                 }
             }
 
+        remoteVideo.addEventListener("click", async () => {
+    if (remoteVideo.requestFullscreen) {
+        await remoteVideo.requestFullscreen();
+    } else if (remoteVideo.webkitEnterFullscreen) {
+        remoteVideo.webkitEnterFullscreen();
+    }
+});
+
         </script>
 
     </body>
