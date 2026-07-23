@@ -345,8 +345,6 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             break;}
 
         case WStype_TEXT:{
-            Serial.print("RX: ");
-            Serial.println((char *)payload);            
             JsonDocument request;
 
             if(!deserializeJson(request,(char *)payload)){
@@ -376,9 +374,14 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     JsonDocument payload_ = request["payload"]; //.to<JsonObject>();
                     if (payload_["dir"]=="right"){
                         if(payload_["isPressed"]){
+                            digitalWrite(in1, LOW); digitalWrite(in2, HIGH);
+                            digitalWrite(in3, HIGH); digitalWrite(in4, LOW);                            
                             Serial.println("Moving right");
                         }
                         else{
+                                                     digitalWrite(in2, LOW);
+                            digitalWrite(in3, LOW); 
+
                             Serial.println("Stop moving right");
                         }
                     }
@@ -387,10 +390,11 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                             //left
                             digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
                             digitalWrite(in3, LOW); digitalWrite(in4, HIGH);
-                            Serial.println("Moving left");
-                                                        
+                            Serial.println("Moving left");                                                        
                         }
                         else{
+                            digitalWrite(in1, LOW); 
+                                                    digitalWrite(in4, LOW);
                             Serial.println("Stop moving left");
                         }
 
@@ -403,19 +407,22 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                             Serial.println("Moving up");
                         }
                         else{
+                            digitalWrite(in2, LOW);
+                                                    digitalWrite(in4, LOW);                            
                             Serial.println("Stop moving up");
                         }
 
                     }
                     if (payload_["dir"]=="down"){
                         if(payload_["isPressed"]){
-                            Serial.println("Moving down");
                             //backwards
                             digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
                             digitalWrite(in3, HIGH); digitalWrite(in4, LOW);
-
+                            Serial.println("Moving down");
                         }
                         else{
+                            digitalWrite(in1, LOW);// digitalWrite(in2, LOW);
+                            digitalWrite(in3, LOW);// digitalWrite(in4, LOW);
                             Serial.println("Stop moving down");
                         }
 
@@ -423,11 +430,20 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 
                 }
             }
+            else
+            {
+                Serial.print("RX: ");
+                Serial.println((char *)payload);
+            }
             break;}
 
             // ws.sendTXT("{\"Type\":\"device\"}")
 
         case WStype_DISCONNECTED:{
+            
+            digitalWrite(in1, LOW); digitalWrite(in2, LOW);
+            digitalWrite(in3, LOW); digitalWrite(in4, LOW);        
+
             Serial.println("Disconnected");
             Serial.println("Trying to reconnect.");
             ws.beginSSL(
@@ -463,7 +479,7 @@ void setup()
 
     Serial.println("\nWiFi connected.");
 ///////---------------------v
-    Serial.println("Initialising Crypto Primitives.")
+    Serial.println("Initialising Crypto Primitives.");
     initRandom();
 
     loadOrCreateKey();
@@ -473,7 +489,7 @@ void setup()
     signMessage("Hello World");
 ///////---------------------^
 
-    Serial.println("Initialising motor pins")
+    Serial.println("Initialising motor pins");
     // Set motor pins as output
     pinMode(in1, OUTPUT);
     pinMode(in2, OUTPUT);
