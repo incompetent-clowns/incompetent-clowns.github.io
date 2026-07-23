@@ -204,7 +204,7 @@
         signatureEl = document.getElementById("signature");
         signNowEl = document.getElementById("signNow");
 
-        
+
 
         signNowEl.addEventListener("click", () => {
             signMessage(messageToSignEl.textContent, keyPair).then(
@@ -224,9 +224,10 @@
     <!-- <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br /> -->
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use cam1)">cam1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
-    <button id="authenticateNow">Reconnect</button> <br /><br />
+    <button id="authenticateNow">Reconnect</button><br /><br />
+    <!-- <button id="fullscreen">Fullscreen Toggle</button><br /><br /> -->
     <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
-    
+
     <button id="disconnect">Disconnect Call</button>
 
     <h3>Local</h3>
@@ -271,8 +272,8 @@
         //     const result = await a_signMessage(0,0);
         // });
 
-        
-        async function connect(event){
+
+        async function connect(event) {
 
             localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
             // localStorage.setItem("projectName", projectNameEl.value);
@@ -322,15 +323,15 @@
                     ws.send(JSON.stringify(response));
                 }
 
-                if(inDat.Type == "resetWebRTC"){
-                    if(pc){
+                if (inDat.Type == "resetWebRTC") {
+                    if (pc) {
                         pc.close()
                         pc = null
                     }
-                
+
                 }
 
-                if(inDat.Type == "pageReload"){
+                if (inDat.Type == "pageReload") {
                     window.location.reload();
                 }
 
@@ -355,30 +356,32 @@
                 }
             };
 
-            
+
 
             //TODO: add a reconnect loop if the ws connection drops
             ws.onclose = async function (msg) {
                 connect();
-                
-            }        
+
+            }
         }
 
-        authenticateNowEl.addEventListener("click", (event) => connect(event));        
+        authenticateNowEl.addEventListener("click", (event) => connect(event));
         document.getElementById("disconnect").addEventListener("click", async () => {
-            try{
+            try {
                 document.getElementById("local").srcObject = null;
                 await pc.close();
                 pc = null;
                 log("Disconnected.")
             }
-            catch{
+            catch {
                 log("Not on a call.")
             }
         });
 
-        
-        
+
+
+
+
         connect();
         // document.window.onload(connect);
 
@@ -408,16 +411,33 @@
             };
 
             pc.onicecandidate = e => {
-                if (e.candidate) {                    
+                if (e.candidate) {
                     ws.send(JSON.stringify({ type: "ice", to: "_user_", candidate: e.candidate }));
                 }
             }
         }
 
+        let remoteVideoEl = document.getElementById("remote")
+        let localVideoEl = document.getElementById("local")
+        
+        remoteVideoEl.addEventListener("click", () => toggleFullscreen(remoteVideoEl));
+        localVideoEl.addEventListener("click", () => toggleFullscreen(localVideoEl));
+
+        async function toggleFullscreen(fullEl) {
+            try {
+                if (document.fullscreenElement) {
+                    await document.exitFullscreen();
+                } else {
+                    await fullEl.requestFullscreen();
+                }
+            } catch (err) {
+                console.error("Fullscreen failed:", err);
+            }
+        }
 
     </script>
 
-    
+
 
 
 
