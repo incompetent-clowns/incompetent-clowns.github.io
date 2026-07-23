@@ -220,6 +220,11 @@
                     await pc.close();
                     pc = null;
                     log("Killed the peer connection object.");
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => track.stop());
+                        localStream = null;
+                    }                    
+                    log("Released the local camera.")
                     await delay(1000);
 
                     const deviceID = deviceIDEl.value;

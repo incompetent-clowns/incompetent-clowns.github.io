@@ -373,6 +373,11 @@
                 await pc.close();
                 pc = null;
                 log("Disconnected.")
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
+                log("Released the local camera.")
             }
             catch {
                 log("Not on a call.")
@@ -447,6 +452,11 @@
 
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+
+        function log(str) {
+            statusEl.value = statusEl.value + str + "\n";
         }
 
     </script>
