@@ -41,6 +41,13 @@ mbedtls_entropy_context entropy;
 mbedtls_ctr_drbg_context ctr;
 
 
+///// MOTOR
+const int in1 = 26;
+const int in2 = 25;
+const int in3 = 33;
+const int in4 = 32;
+
+
 void printHex(const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++)
@@ -366,7 +373,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
 
                 if(request["Type"] == "cmd"){
                     Serial.println("Command sent by user.");
-                    JsonDocument payload_ = response["payload"]; //.to<JsonObject>();
+                    JsonDocument payload_ = request["payload"]; //.to<JsonObject>();
                     if (payload_["dir"]=="right"){
                         if(payload_["isPressed"]){
                             Serial.println("Moving right");
@@ -377,7 +384,11 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     }
                     if (payload_["dir"]=="left"){
                         if(payload_["isPressed"]){
+                            //left
+                            digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
+                            digitalWrite(in3, LOW); digitalWrite(in4, HIGH);
                             Serial.println("Moving left");
+                                                        
                         }
                         else{
                             Serial.println("Stop moving left");
@@ -386,6 +397,9 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     }
                     if (payload_["dir"]=="up"){
                         if(payload_["isPressed"]){
+                            //forward
+                            digitalWrite(in1, LOW); digitalWrite(in2, HIGH);
+                            digitalWrite(in3, LOW); digitalWrite(in4, HIGH);
                             Serial.println("Moving up");
                         }
                         else{
@@ -396,6 +410,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     if (payload_["dir"]=="down"){
                         if(payload_["isPressed"]){
                             Serial.println("Moving down");
+                            //backwards
+                            digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
+                            digitalWrite(in3, HIGH); digitalWrite(in4, LOW);
+
                         }
                         else{
                             Serial.println("Stop moving down");
@@ -445,6 +463,7 @@ void setup()
 
     Serial.println("\nWiFi connected.");
 ///////---------------------v
+    Serial.println("Initialising Crypto Primitives.")
     initRandom();
 
     loadOrCreateKey();
@@ -454,7 +473,17 @@ void setup()
     signMessage("Hello World");
 ///////---------------------^
 
+    Serial.println("Initialising motor pins")
+    // Set motor pins as output
+    pinMode(in1, OUTPUT);
+    pinMode(in2, OUTPUT);
+    pinMode(in3, OUTPUT);
+    pinMode(in4, OUTPUT);
 
+
+
+
+////////////////////
     ws.beginSSL(
         "mac.taild17908.ts.net",
         443,
