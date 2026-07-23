@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
-
+    
 <head>
+    <meta charset="UTF-8">
     <title>Project B | Device </title>
 </head>
 
@@ -361,7 +362,7 @@
             //TODO: add a reconnect loop if the ws connection drops
             ws.onclose = async function (msg) {
                 connect();
-
+                await delay(5000);
             }
         }
 
@@ -419,7 +420,7 @@
 
         let remoteVideoEl = document.getElementById("remote")
         let localVideoEl = document.getElementById("local")
-        
+
         remoteVideoEl.addEventListener("click", () => toggleFullscreen(remoteVideoEl));
         localVideoEl.addEventListener("click", () => toggleFullscreen(localVideoEl));
 
