@@ -264,9 +264,15 @@
 
             function move(dir, isPressed) {
                 console.log(dir, isPressed ? 'pressed' : 'released');
+
+                const ESP32deviceID = ESP32deviceIDEl.value;
+                // const messageToESP32 = messageToESP32El.value;
+                // const ESP32deviceIDEl
+                send({ Type: "cmd", to: ESP32deviceID, payload: {dir, isPressed ? 'pressed' : 'released'} });
+
                 // Hook your game logic here, e.g.:
                 // if (isPressed) player.startMoving(dir); else player.stopMoving(dir);
-                
+
             }
 
             directions.forEach(dir => {
