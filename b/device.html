@@ -430,6 +430,7 @@
                     await document.exitFullscreen();
                 } else {
                     await fullEl.requestFullscreen();
+                    await fullEl.webkitEnterFullscreen();
                 }
             } catch (err) {
                 console.error("Fullscreen failed:", err);

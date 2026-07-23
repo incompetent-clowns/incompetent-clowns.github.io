@@ -365,19 +365,20 @@
                         await document.exitFullscreen();
                     } else {
                         await fullEl.requestFullscreen();
+                        await fullEl.webkitEnterFullscreen();
                     }
                 } catch (err) {
                     console.error("Fullscreen failed:", err);
                 }
             }
 
-        remoteVideo.addEventListener("click", async () => {
-    if (remoteVideo.requestFullscreen) {
-        await remoteVideo.requestFullscreen();
-    } else if (remoteVideo.webkitEnterFullscreen) {
-        remoteVideo.webkitEnterFullscreen();
-    }
-});
+    //     remoteVideo.addEventListener("click", async () => {
+    // if (remoteVideo.requestFullscreen) {
+    //     await remoteVideo.requestFullscreen();
+    // } else if (remoteVideo.webkitEnterFullscreen) {
+    //     remoteVideo.webkitEnterFullscreen();
+    // }
+// });
 
         </script>
 
