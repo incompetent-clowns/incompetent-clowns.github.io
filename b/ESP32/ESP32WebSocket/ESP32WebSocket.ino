@@ -166,18 +166,6 @@ void printPublicKey()
     printHex(y, 32);
 }
 
-    // uint8_t sig[80];
-    // size_t sigLen = 0;
-
-    // int ret = mbedtls_ecdsa_write_signature(
-    //     &key,
-    //     MBEDTLS_MD_SHA256,
-    //     hash,
-    //     sizeof(hash),
-    //     sig,
-    //     &sigLen,
-    //     mbedtls_ctr_drbg_random,
-    //     &ctr);
 
 String signMessage_(const String &msg)
 {
@@ -216,7 +204,6 @@ String signMessage_(const String &msg)
 
     printHex(sig, sigLen);
     return String((char *)sig);
-    // return String((char *)b64);
 }
 
 String signMessage(const String &msg)
@@ -354,17 +341,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
             Serial.print("RX: ");
             Serial.println((char *)payload);            
             JsonDocument request;
-            // deserializeJson(request,payload);
-            // DeserializationError err = deserializeJson(request, payload);
 
-            // if (err)
-            // {
-            //     Serial.println("Invalid JSON");
-            //     return;
-            // }            
-            //If Json request, 
-            // if(!err){
-            // if(1){
             if(!deserializeJson(request,(char *)payload)){
                 // Serial.println(request["Type"]);
                 if(request["Type"]=="auth"){
@@ -400,7 +377,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                 "/",
                 ""          // <-- disable "arduino" subprotocol
             );
-
+            delay(5000);
             break;}
 
         case WStype_ERROR:{
@@ -437,29 +414,6 @@ void setup()
 ///////---------------------^
 
 
-//////-------------------v
-    // LittleFS.begin();
-    // initRandom();
-
-    // if (!loadKey())
-    // {
-    //     Serial.println("Generating new key...");
-    //     generateKey();
-    //     saveKey();
-    // }
-    // else
-    // {
-    //     Serial.println("Loaded existing key.");
-    // }    
-
-    // printPublicKey();
-
-//////------------------------^
-
-
-    //
-    // host, port, path, protocol
-    //
     ws.beginSSL(
         "mac.taild17908.ts.net",
         443,
