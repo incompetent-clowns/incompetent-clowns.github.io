@@ -11,9 +11,10 @@
         <button id="login">Login with Google</button>
         <br>
         <br><br>
-        
+
         <input id="deviceID" placeholder="device ID" />
         <button id="connect">Connect</button>
+        <button id="disconnect">Disconnect</button>
         <br><br>
         <button id="resetWebRTC">Request remote WebRTC reset</button>
         <br><br>
@@ -28,9 +29,9 @@
         <video id="remote" autoplay playsinline></video>
 
         <h3>ESP32</h3>
-        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br/>
+        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br />
         <textarea id="messageToESP32" rows="5" cols="60" placeholder="Message to ESP32"></textarea> <br />
-        <button id="btnESP32">Send to ESP32</button> <br/>
+        <button id="btnESP32">Send to ESP32</button> <br />
 
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
@@ -127,12 +128,24 @@
                 const ESP32deviceID = ESP32deviceIDEl.value;
                 const messageToESP32 = messageToESP32El.value;
                 // const ESP32deviceIDEl
-                send({Type: "plain", to:ESP32deviceID, payload:messageToESP32});
+                send({ Type: "plain", to: ESP32deviceID, payload: messageToESP32 });
             }
 
             document.getElementById("resetWebRTC").onclick = async () => {
                 const deviceID = deviceIDEl.value;
-                send({Type: "resetWebRTC", to:deviceID});
+                send({ Type: "resetWebRTC", to: deviceID });
+            }
+
+            document.getElementById("disconnect").onclick = async () => {
+                try {
+                    document.getElementById("local").srcObject = null;
+                    await pc.close();
+                    pc = null;
+                    log("Disconnected.")
+                }
+                catch {
+                    log("Not on a call.")
+                }
             }
 
             document.getElementById("connect").onclick = async () => {

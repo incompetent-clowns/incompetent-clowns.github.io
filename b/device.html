@@ -363,7 +363,9 @@
         authenticateNowEl.addEventListener("click", (event) => connect(event));        
         document.getElementById("disconnect").addEventListener("click", async () => {
             try{
+                document.getElementById("local").srcObject = null;
                 await pc.close();
+                pc = null;
                 log("Disconnected.")
             }
             catch{
