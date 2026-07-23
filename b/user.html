@@ -120,9 +120,21 @@
             const WS_BACKEND = "wss://mac.taild17908.ts.net";
 
             statusEl = document.getElementById("regStatus");
-            deviceIDEl = document.getElementById("deviceID");
             messageToESP32El = document.getElementById("messageToESP32");
+
+            deviceIDEl = document.getElementById("deviceID");
             ESP32deviceIDEl = document.getElementById("ESP32deviceID");
+
+            saveddeviceID = localStorage.getItem("deviceID");
+            savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+
+            if(saveddeviceID){
+                deviceIDEl.textContent = saveddeviceID
+            }
+
+            if(savedESP32deviceID){
+                ESP32deviceIDEl.textContent = savedESP32deviceID
+            }
 
             let socket;
             let pc;
