@@ -87,7 +87,16 @@
         <video id="remote" autoplay playsinline></video>
 
         <h3>ESP32</h3>
-        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br />
+        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br /><br /><br />
+        <div class="dpad">
+            <button id="up">▲</button>
+            <button id="left">◀</button>
+            <button id="right">▶</button>
+            <button id="down">▼</button>
+        </div>
+        <br />
+        <br />
+        <br />
         <textarea id="messageToESP32" rows="5" cols="60" placeholder="Message to ESP32"></textarea> <br />
         <button id="btnESP32">Send to ESP32</button> <br />
 
@@ -119,16 +128,7 @@
                 };
 
                 await ensurePeerConnection();
-                // document.getElementById("test").onclick = async () => {
-                //     statusEl.value = statusEl.value + `Sending a POST\n`
 
-                //     const res = await fetch(`${BACKEND}/auth/google`, {
-                //         method: "POST",
-                //         headers: { "Content-WType": "application/json" },
-                //         body: JSON.stringify({ idToken: "Gababa" })
-                //     });
-                //     statusEl.value = statusEl.value + `Response from the server:\n ${res}\n${JSON.stringify(res)}\n`
-                // };
             };
 
             async function handleGoogleLogin(response) {
@@ -255,35 +255,44 @@
                     }
                 };
             }
-            // async function ensurePeerConnection() {
-            //     if (pc) return;
 
-            //     localStream = await navigator.mediaDevices.getUserMedia({
-            //         video: true,
-            //         audio: true
-            //     });
+        </script>
 
-            //     document.getElementById("local").srcObject = localStream;
 
-            //     pc = new RTCPeerConnection({
-            //         iceServers: [
-            //             { urls: "stun:stun.l.google.com:19302" }
-            //         ]
-            //     });
+        <script>
+            const directions = ['up', 'down', 'left', 'right'];
 
-            //     localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+            function move(dir, isPressed) {
+                console.log(dir, isPressed ? 'pressed' : 'released');
+                // Hook your game logic here, e.g.:
+                // if (isPressed) player.startMoving(dir); else player.stopMoving(dir);
+                
+            }
 
-            //     pc.ontrack = e => {
-            //         document.getElementById("remote").srcObject = e.streams[0];
-            //     };
+            directions.forEach(dir => {
+                const btn = document.getElementById(dir);
 
-            //     pc.onicecandidate = e => {
-            //         if (e.candidate) {
-            //             send({ type: "ice", to: currentPeer(), candidate: e.candidate });
-            //         }
-            //     };
-            // }
+                const start = (e) => {
+                    e.preventDefault(); // stops synthetic mouse events + long-press menu
+                    btn.classList.add('pressed');
+                    move(dir, true);
+                };
 
+                const end = (e) => {
+                    e.preventDefault();
+                    btn.classList.remove('pressed');
+                    move(dir, false);
+                };
+
+                btn.addEventListener('touchstart', start, { passive: false });
+                btn.addEventListener('touchend', end);
+                btn.addEventListener('touchcancel', end);
+
+                // Fallback for desktop/mouse testing
+                btn.addEventListener('mousedown', start);
+                btn.addEventListener('mouseup', end);
+                btn.addEventListener('mouseleave', end);
+            });
         </script>
 
     </body>
