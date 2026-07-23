@@ -13,12 +13,12 @@
                 background: #222;
             } */
 
-            .dpadContainer{
+            .dpadContainer {
                 margin: 10;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width:page-width;
+                width: page-width;
                 /* background: #222; */
                 /* gap: 10px; */
             }
@@ -99,7 +99,7 @@
 
         <h3>ESP32</h3>
         <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br /><br /><br />
-        <div class="dpadContainer">            
+        <div class="dpadContainer">
             <div class="dpad">
                 <button id="up">▲</button>
                 <button id="left">◀</button>
@@ -212,7 +212,7 @@
                 send({ Type: "pageReload", to: deviceID });
             }
 
-            
+
 
             document.getElementById("disconnect").onclick = async () => {
                 try {
@@ -288,7 +288,7 @@
                 const ESP32deviceID = ESP32deviceIDEl.value;
                 // const messageToESP32 = messageToESP32El.value;
                 // const ESP32deviceIDEl
-                send({ Type: "cmd", to: ESP32deviceID, payload: { dir, isPressed} });
+                send({ Type: "cmd", to: ESP32deviceID, payload: { dir, isPressed } });
 
                 // Hook your game logic here, e.g.:
                 // if (isPressed) player.startMoving(dir); else player.stopMoving(dir);
@@ -350,7 +350,27 @@
 
                 document.getElementById(dir).classList.remove('pressed');
                 move(dir, false);
-            });            
+            });
+
+
+            let remoteVideoEl = document.getElementById("remote")
+            let localVideoEl = document.getElementById("local")
+
+            remoteVideoEl.addEventListener("click", () => toggleFullscreen(remoteVideoEl));
+            localVideoEl.addEventListener("click", () => toggleFullscreen(localVideoEl));
+
+            async function toggleFullscreen(fullEl) {
+                try {
+                    if (document.fullscreenElement) {
+                        await document.exitFullscreen();
+                    } else {
+                        await fullEl.requestFullscreen();
+                    }
+                } catch (err) {
+                    console.error("Fullscreen failed:", err);
+                }
+            }
+
         </script>
 
     </body>
