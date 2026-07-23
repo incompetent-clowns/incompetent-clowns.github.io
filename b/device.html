@@ -355,10 +355,13 @@
 
                 if (inDat.Type == "resetWebRTC" && checkEmail(inDat.from)) {
                     if (pc) {
-                        pc.close()
+                        await pc.close()
                         pc = null
                     }
-
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => track.stop());
+                        localStream = null;
+                    }
                 }
 
                 if (inDat.Type == "pageReload" && checkEmail(inDat.from)) {
