@@ -220,7 +220,7 @@
                     await pc.close();
                     pc = null;
                     log("Killed the peer connection object.");
-                    await delay(3000);
+                    await delay(1000);
 
                     const deviceID = deviceIDEl.value;
                     send({ Type: "resetWebRTC", to: deviceID });
@@ -282,7 +282,7 @@
             }
 
             function log(str) {
-                statusEl.value = statusEl.value + str;
+                statusEl.value = statusEl.value + str + "\n";
             }
 
         </script>
@@ -389,6 +389,9 @@
             // }
             // });
 
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
         </script>
 
     </body>

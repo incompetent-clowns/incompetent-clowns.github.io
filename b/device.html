@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-    
+
 <head>
     <meta charset="UTF-8">
     <title>Project B | Device </title>
@@ -435,6 +435,10 @@
             } catch (err) {
                 console.error("Fullscreen failed:", err);
             }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
 
     </script>
