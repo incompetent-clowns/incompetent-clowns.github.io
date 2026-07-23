@@ -255,9 +255,17 @@
             async function ensurePeerConnection() {
                 if (pc) return;
 
+                // localStream = await navigator.mediaDevices.getUserMedia({
+                //     video: true,
+                //     audio: true
+                // });
                 localStream = await navigator.mediaDevices.getUserMedia({
-                    video: true,
-                    audio: true
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    },
+                    video: true
                 });
 
                 document.getElementById("local").srcObject = localStream;
