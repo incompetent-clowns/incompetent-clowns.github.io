@@ -225,6 +225,10 @@
     <!-- <textarea id="projectName" rows="1" cols="60" placeholder="Project Name (default b)" default="B">b</textarea> <br /> -->
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use cam1)">cam1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
+
+    <textarea id="allowedEmails" rows="5" cols="60"
+        placeholder="Legal emails (use gmail)">atul.singh.arora@gmail.com</textarea> <br />
+
     <button id="authenticateNow">Reconnect</button><br /><br />
     <!-- <button id="fullscreen">Fullscreen Toggle</button><br /><br /> -->
     <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
@@ -245,15 +249,22 @@
         deviceTypeEl = document.getElementById("deviceType");
         authStatusEl = document.getElementById("regStatus");
 
+        allowedEmailsEl = document.getElementById("allowedEmails");
+
         savedserverURL = localStorage.getItem("serverURL");
         // savedprojectName = localStorage.getItem("projectName");
         saveddeviceId = localStorage.getItem("deviceId");
         saveddeviceType = localStorage.getItem("deviceType");
+        savedallowedEmails = localStorage.getItem("allowedEmails");
 
         let pc;
         let localStream;
         let ws;
+        let allowEmailsSet;
 
+        if (allowedEmails.has(candidateEmail.trim().toLowerCase())) {
+            console.log("Allowed!");
+        }
 
         if (savedserverURL) {
             serverURLEl.textContent = savedserverURL;
@@ -268,6 +279,9 @@
             deviceTypeEl.textContent = saveddeviceType;
         }
 
+        if (savedallowedEmails) {
+            allowedEmailsEl.textContent = savedallowedEmails
+        }
 
         // authenticateNowEl.addEventListener("click", async (event) => {
         //     const result = await a_signMessage(0,0);
@@ -280,6 +294,15 @@
             // localStorage.setItem("projectName", projectNameEl.value);
             localStorage.setItem("deviceId", deviceIdEl.value);
             localStorage.setItem("deviceType", deviceTypeEl.value);
+            localStorage.setItem("allowedEmails", allowedEmailsEl.value);
+
+            allowedEmailsSet = new Set(allowedEmailsEl
+                .value
+                .split(",")
+                .map(email => email.trim().toLowerCase())
+                .filter(email => email.length > 0)
+            );
+
 
             authStatusEl.value = authStatusEl.value + "\nInitialising WebRTC"
             await ensurePeerConnection()
