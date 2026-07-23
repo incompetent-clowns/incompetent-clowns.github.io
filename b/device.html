@@ -226,8 +226,10 @@
     <textarea id="deviceId" rows="1" cols="60" placeholder="Device Id (use cam1)">cam1</textarea> <br />
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
 
+    <p>Input Gmail emails that are allowed to use this device<br>
+    (comma separated, e.g. "a1@gmail.com, a2@gmail.com").</p>
     <textarea id="allowedEmails" rows="5" cols="60"
-        placeholder="Legal emails (use gmail)">atul.singh.arora@gmail.com</textarea> <br />
+        placeholder="Allowed emails (use gmail)">atul.singh.arora@gmail.com</textarea> <br />
 
     <button id="authenticateNow">Reconnect</button><br /><br />
     <!-- <button id="fullscreen">Fullscreen Toggle</button><br /><br /> -->
@@ -262,9 +264,9 @@
         let ws;
         let allowEmailsSet;
 
-        if (allowedEmails.has(candidateEmail.trim().toLowerCase())) {
-            console.log("Allowed!");
-        }
+        // if (allowedEmails.has(candidateEmail.trim().toLowerCase())) {
+        //     console.log("Allowed!");
+        // }
 
         if (savedserverURL) {
             serverURLEl.textContent = savedserverURL;
@@ -347,7 +349,7 @@
                     ws.send(JSON.stringify(response));
                 }
 
-                if (inDat.Type == "resetWebRTC") {
+                if (inDat.Type == "resetWebRTC" && checkEmail(inDat.from)) {
                     if (pc) {
                         pc.close()
                         pc = null
@@ -355,12 +357,12 @@
 
                 }
 
-                if (inDat.Type == "pageReload") {
+                if (inDat.Type == "pageReload" && checkEmail(inDat.from)) {
                     window.location.reload();
                 }
 
                 //Handling things for WebRTC now
-                if (inDat.type == "offer") {
+                if (inDat.type == "offer" && checkEmail(inDat.from)) {
                     authStatusEl.value = authStatusEl.value + "\n\nOffer Received\n"
                     //Ensures the "pc" variable is initialised
                     await ensurePeerConnection();
@@ -375,7 +377,7 @@
                     authStatusEl.value = authStatusEl.value + "\nSent the configuration\n"
                 }
 
-                if (inDat.type == "ice") {
+                if (inDat.type == "ice" && checkEmail(inDat.from)) {
                     await pc.addIceCandidate(inDat.candidate);
                 }
             };
@@ -407,7 +409,9 @@
             }
         });
 
-
+        function checkEmail(str){
+            return allowedEmails.has(candidateEmail.trim().toLowerCase());
+        }
 
 
 
