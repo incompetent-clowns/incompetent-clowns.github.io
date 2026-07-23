@@ -14,7 +14,12 @@
             } */
 
             .dpadContainer{
+                margin: 10;
+                display: flex;
+                justify-content: center;
                 align-items: center;
+                /* background: #222; */
+                /* gap: 10px; */
             }
 
             .dpad {
@@ -79,6 +84,7 @@
         <button id="disconnect">Disconnect</button>
         <br><br>
         <button id="resetWebRTC">Request remote WebRTC reset</button>
+        <button id="pageReload">Request remote webpage reload</button>
         <br><br>
 
         <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
@@ -92,11 +98,13 @@
 
         <h3>ESP32</h3>
         <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br /><br /><br />
-        <div class="dpad">
-            <button id="up">▲</button>
-            <button id="left">◀</button>
-            <button id="right">▶</button>
-            <button id="down">▼</button>
+        <div class="dpadContainer">            
+            <div class="dpad">
+                <button id="up">▲</button>
+                <button id="left">◀</button>
+                <button id="right">▶</button>
+                <button id="down">▼</button>
+            </div>
         </div>
         <br />
         <br />
@@ -197,6 +205,13 @@
                 const deviceID = deviceIDEl.value;
                 send({ Type: "resetWebRTC", to: deviceID });
             }
+
+            document.getElementById("pageReload").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                send({ Type: "pageReload", to: deviceID });
+            }
+
+            
 
             document.getElementById("disconnect").onclick = async () => {
                 try {

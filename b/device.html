@@ -330,6 +330,10 @@
                 
                 }
 
+                if(inDat.Type == "pageReload"){
+                    window.location.reload();
+                }
+
                 //Handling things for WebRTC now
                 if (inDat.type == "offer") {
                     authStatusEl.value = authStatusEl.value + "\n\nOffer Received\n"
