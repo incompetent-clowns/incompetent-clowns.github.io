@@ -366,10 +366,10 @@
                 }
 
                 if (inDat.Type == "allowedEmails" && checkEmail(inDat.from)) {
-                    allowedEmailsEl.value = inDat.allowedEmails; //  + "," + inDat.from;
+                    allowedEmailsEl.value = inDat.allowedEmails; 
                     allowedEmailSetGenerate();
                     
-                    //Stupid proofing---if the user accidentally removes their own access, 
+                    //Stupid proofing---if the user accidentally removes their own access, prevent that from happening
                     if(!checkEmail(inDat.from)){
                         allowedEmailsEl.value = inDat.allowedEmails + "," + inDat.from
                         allowedEmailSetGenerate();

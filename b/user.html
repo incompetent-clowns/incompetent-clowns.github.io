@@ -90,10 +90,11 @@
 
         <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
 
-
-        <textarea id="allowedEmails">atul.singh.arora@gmail.com,toatularora@gmail.com</textarea>
-        <button id="allowedEmailsUpdate">Update Allowed Emails</button>
-
+        <br><br>
+        <textarea id="allowedEmails" rows="3" cols="50">atul.singh.arora@gmail.com,toatularora@gmail.com</textarea>
+        <br><br>
+        <button id="allowedEmailsUpdate">Update Emails Allowed on the Device</button>
+        <br><br>
 
         <h3>Local</h3>
         <video id="local" autoplay muted playsinline></video>
@@ -230,8 +231,9 @@
             }
 
             document.getElementById("allowedEmailsUpdate").onclick = async () => {
+                const deviceID = deviceIDEl.value;
                 const allowedEmails = allowedEmailsEl.value;
-                send({ Type: "pageReload", to: deviceID });
+                send({ Type: "allowedEmails", to: deviceID, allowedEmails: allowedEmails});
             }
 
 
