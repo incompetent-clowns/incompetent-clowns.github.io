@@ -219,7 +219,10 @@
                     document.getElementById("local").srcObject = null;
                     await pc.close();
                     pc = null;
-                    log("Disconnected.")
+                    log("Killed the peer connection object.");
+                    const deviceID = deviceIDEl.value;
+                    send({ Type: "resetWebRTC", to: deviceID });
+                    log("Requested the remote client to do the same.");
                 }
                 catch {
                     log("Not on a call.")
@@ -372,13 +375,13 @@
                 }
             }
 
-    //     remoteVideo.addEventListener("click", async () => {
-    // if (remoteVideo.requestFullscreen) {
-    //     await remoteVideo.requestFullscreen();
-    // } else if (remoteVideo.webkitEnterFullscreen) {
-    //     remoteVideo.webkitEnterFullscreen();
-    // }
-// });
+            //     remoteVideo.addEventListener("click", async () => {
+            // if (remoteVideo.requestFullscreen) {
+            //     await remoteVideo.requestFullscreen();
+            // } else if (remoteVideo.webkitEnterFullscreen) {
+            //     remoteVideo.webkitEnterFullscreen();
+            // }
+            // });
 
         </script>
 
