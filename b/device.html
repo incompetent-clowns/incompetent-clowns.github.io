@@ -361,6 +361,11 @@
                     window.location.reload();
                 }
 
+                if (inDat.Type == "allowedEmails" && checkEmail(inDat.from)) {
+                    allowedEmailsEl.value = inDat.allowedEmails; //  + "," + inDat.from;
+                    localStorage.setItem("allowedEmails", allowedEmailsEl.value);
+                }
+
                 //Handling things for WebRTC now
                 if (inDat.type == "offer" && checkEmail(inDat.from)) {
                     authStatusEl.value = authStatusEl.value + "\n\nOffer Received\n"
