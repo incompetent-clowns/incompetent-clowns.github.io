@@ -373,7 +373,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     ws.sendTXT(str_response);
                 }
 
-                if(request["Type"] == "cmd"){
+                if(request["Type"] == "cmd" && request["from"] == "atul.singh.arora@gmail.com"){
                     Serial.println("Command sent by user.");
                     JsonDocument payload_ = request["payload"]; //.to<JsonObject>();
                     if (payload_["dir"]=="right"){

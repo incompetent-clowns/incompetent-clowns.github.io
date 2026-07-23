@@ -97,6 +97,8 @@
         <br><br>
 
         <h3>Local</h3>
+        <button id="muteBtn" onclick="toggleAudio()">Mute</button>
+        <button id="camBtn" onclick="toggleVideo()">Camera Off</button> <br/>
         <video id="local" autoplay muted playsinline></video>
 
         <h3>Remote</h3>
@@ -134,11 +136,12 @@
             saveddeviceID = localStorage.getItem("deviceID");
             savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
-            if(saveddeviceID){
+
+            if (saveddeviceID) {
                 deviceIDEl.value = saveddeviceID;
             }
 
-            if(savedESP32deviceID){
+            if (savedESP32deviceID) {
                 ESP32deviceIDEl.value = savedESP32deviceID;
             }
 
@@ -233,7 +236,7 @@
             document.getElementById("allowedEmailsUpdate").onclick = async () => {
                 const deviceID = deviceIDEl.value;
                 const allowedEmails = allowedEmailsEl.value;
-                send({ Type: "allowedEmails", to: deviceID, allowedEmails: allowedEmails});
+                send({ Type: "allowedEmails", to: deviceID, allowedEmails: allowedEmails });
             }
 
 
@@ -247,7 +250,7 @@
                     if (localStream) {
                         localStream.getTracks().forEach(track => track.stop());
                         localStream = null;
-                    }                    
+                    }
                     log("Released the local camera.")
                     await delay(1000);
 
@@ -263,10 +266,10 @@
             document.getElementById("connect").onclick = async () => {
                 localStorage.setItem("deviceID", deviceIDEl.value);
                 localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
-            // saveddeviceID = localStorage.getItem("deviceID");
-            // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+                // saveddeviceID = localStorage.getItem("deviceID");
+                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
-                
+
 
                 const deviceID = deviceIDEl.value;
                 await ensurePeerConnection();
@@ -329,6 +332,24 @@
                 statusEl.value = statusEl.value + str + "\n";
             }
 
+        </script>
+
+        <script>
+            let videoEnabled = true;
+            let audioEnabled = true;
+            function toggleVideo() {
+                videoEnabled = !videoEnabled;
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = videoEnabled;
+                });
+            }
+
+            function toggleAudio() {
+                audioEnabled = !audioEnabled;
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = audioEnabled;
+                });
+            }            
         </script>
 
 
