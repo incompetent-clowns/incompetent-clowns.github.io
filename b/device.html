@@ -313,7 +313,8 @@
         //     const result = await a_signMessage(0,0);
         // });
 
-        authenticateNowEl.addEventListener("click", async (event) => {
+        document.onload
+        async function connect(event){
 
             localStorage.setItem("serverURL", serverURLEl.value); //careful, if you use textContent, this will be stale
             // localStorage.setItem("projectName", projectNameEl.value);
@@ -342,14 +343,6 @@
 
                     authStatusEl.value = authStatusEl.value + "\nChallenge: " + inDat.payload.challenge; //+ "\nResult" + Buffer.from(inDat.challenge, "utf8").toString("hex");
 
-                    // globalThis.keyPair
-                    // signMessage(messageToSignEl.textContent, keyPair).then(
-                    //     res => { signatureEl.textContent = res }
-                    // );
-                    // let signature = null
-
-                    // signMessage(inDat.challenge,pubEl.value).then( res => {signature = res} )
-                    // authStatusEl.value = authStatusEl.value + "\nThis should be public:" + JSON.stringify(await exportPublicKey(keyPair.publicKey))
                     pubKey = await exportPublicKey(keyPair.publicKey)
                     const signature = await a_signMessage(inDat.payload.challenge, keyPair);
 
@@ -365,14 +358,6 @@
                         }
                     };
 
-                    // authStatusEl.value = authStatusEl.value + "\nSending this response:" + JSON.stringify(response); 
-                    // ws.send(JSON.stringify(response));
-                    // response = {
-                    //     signature: "glaba",
-                    //     type: "device",
-                    //     deviceId: deviceIdEl.value,
-                    //     deviceType: deviceTypeEl.value
-                    // };
 
                     authStatusEl.value = authStatusEl.value + "\n\nSending this response:\n"
                         + JSON.stringify(response);
@@ -399,8 +384,6 @@
                     authStatusEl.value = authStatusEl.value + "\nAnswer Created\n"
                     await pc.setLocalDescription(answer);
                     authStatusEl.value = authStatusEl.value + "\nLocal Description Updated\n"
-                    // send({ type: "answer", to: inDat.from, sdp: answer });
-                    // ws.send(JSON.stringify({ type: "answer", to: "_user_", sdp: answer }));
                     ws.send(JSON.stringify({ type: "answer", to: inDat.from, sdp: answer }));
                     authStatusEl.value = authStatusEl.value + "\nSent the configuration\n"
                 }
@@ -408,24 +391,16 @@
                 if (inDat.type == "ice") {
                     await pc.addIceCandidate(inDat.candidate);
                 }
-                // else{
-                // msg.payload
-                // }
-
             };
 
             
             //TODO: add a reconnect loop if the ws connection drops
-            // ws.onclose = async function (msg) {
-            //     return
-            // }
+            ws.onclose = async function (msg) {
+                connect()
+            }        
+        }
 
-            // authStatusEl.value = "Gaba";
-            // authStatusEl.value = "gleeba";
-        });
-
-
-
+        authenticateNowEl.addEventListener("click", connect);        
 
 
         // WEBRTC setup 
@@ -463,8 +438,8 @@
 
     </script>
 
-    //
-    <script>
+    
+    <!-- <script>
         //     // Placeholder function for sending messages
         //     function sendMessage() {
         //         // https://mac.taild17908.ts.net/
@@ -485,7 +460,8 @@
 
         //         //   input.value = '';
         //     }
-        // </script>
+        // 
+    </script> -->
     <h3>Local</h3>
     <video id="local" autoplay muted playsinline></video>
 
