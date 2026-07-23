@@ -90,8 +90,10 @@
 
         <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
 
-        
+
+        <textarea id="allowedEmails">atul.singh.arora@gmail.com,toatularora@gmail.com</textarea>
         <button id="allowedEmailsUpdate">Update Allowed Emails</button>
+
 
         <h3>Local</h3>
         <video id="local" autoplay muted playsinline></video>
@@ -123,6 +125,7 @@
 
             statusEl = document.getElementById("regStatus");
             messageToESP32El = document.getElementById("messageToESP32");
+            allowedEmailsEl = document.getElementById("allowedEmails");
 
             deviceIDEl = document.getElementById("deviceID");
             ESP32deviceIDEl = document.getElementById("ESP32deviceID");
@@ -223,6 +226,11 @@
 
             document.getElementById("pageReload").onclick = async () => {
                 const deviceID = deviceIDEl.value;
+                send({ Type: "pageReload", to: deviceID });
+            }
+
+            document.getElementById("allowedEmailsUpdate").onclick = async () => {
+                const allowedEmails = allowedEmailsEl.value;
                 send({ Type: "pageReload", to: deviceID });
             }
 

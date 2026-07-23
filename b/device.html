@@ -227,7 +227,7 @@
     <textarea id="deviceType" rows="1" cols="60" placeholder="Device Type (use phone)">phone</textarea> <br />
 
     <p>Input Gmail emails that are allowed to use this device<br>
-    (comma separated, e.g. "a1@gmail.com, a2@gmail.com").</p>
+        (comma separated, e.g. "a1@gmail.com, a2@gmail.com").</p>
     <textarea id="allowedEmails" rows="5" cols="60"
         placeholder="Allowed emails (use gmail)">atul.singh.arora@gmail.com</textarea> <br />
 
@@ -289,6 +289,15 @@
         //     const result = await a_signMessage(0,0);
         // });
 
+        function allowedEmailSetGenerate() {
+            allowedEmailsSet = new Set(allowedEmailsEl
+                .value
+                .split(",")
+                .map(email => email.trim().toLowerCase())
+                .filter(email => email.length > 0)
+            );
+        }
+
 
         async function connect(event) {
 
@@ -298,12 +307,7 @@
             localStorage.setItem("deviceType", deviceTypeEl.value);
             localStorage.setItem("allowedEmails", allowedEmailsEl.value);
 
-            allowedEmailsSet = new Set(allowedEmailsEl
-                .value
-                .split(",")
-                .map(email => email.trim().toLowerCase())
-                .filter(email => email.length > 0)
-            );
+            allowedEmailSetGenerate()
 
 
             authStatusEl.value = authStatusEl.value + "\nInitialising WebRTC"
@@ -363,6 +367,14 @@
 
                 if (inDat.Type == "allowedEmails" && checkEmail(inDat.from)) {
                     allowedEmailsEl.value = inDat.allowedEmails; //  + "," + inDat.from;
+                    allowedEmailSetGenerate();
+                    
+                    //Stupid proofing---if the user accidentally removes their own access, 
+                    if(!checkEmail(inDat.from)){
+                        allowedEmailsEl.value = inDat.allowedEmails + "," + inDat.from
+                        allowedEmailSetGenerate();
+                    }
+                    
                     localStorage.setItem("allowedEmails", allowedEmailsEl.value);
                 }
 
@@ -414,7 +426,7 @@
             }
         });
 
-        function checkEmail(candidateEmail){
+        function checkEmail(candidateEmail) {
             return allowedEmailsSet.has(candidateEmail.trim().toLowerCase());
         }
 
