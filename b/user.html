@@ -75,6 +75,7 @@
 
     <body>
         <h1>Project B | User</h1>
+        <h3 id="connected">(connected)</h3>
 
         <button id="login">Login with Google</button>
         <br>
@@ -161,6 +162,14 @@
                     google.accounts.id.prompt();
                 };
 
+                const jwt = localStorage.getItem("jwt");
+
+                if (jwt) {
+                    connectWebSocket(jwt);
+                } else {
+                    showConnected();
+                }
+
                 await ensurePeerConnection();
 
             };
@@ -178,6 +187,8 @@
                 const data = await res.json();
 
                 statusEl.value = statusEl.value + `Obtained the following token\n${data.token}`;
+
+                localStorage.setItem("jwt", data.token);
 
                 statusEl.value = statusEl.value + `Trying a websocket connection now.`;
                 connectWebSocket(data.token);
@@ -332,6 +343,10 @@
                 statusEl.value = statusEl.value + str + "\n";
             }
 
+        </script>
+
+        <script>    
+            show
         </script>
 
         <script>
