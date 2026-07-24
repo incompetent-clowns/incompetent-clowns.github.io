@@ -1,0 +1,599 @@
+<!DOCWTYPE html>
+    <html>
+
+    <head>
+        <title>Project B | User</title>
+        <style>
+            /* body {
+                margin: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background: #222;
+            } */
+
+            .dpadContainer {
+                margin: 10;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: page-width;
+                /* background: #222; */
+                /* gap: 10px; */
+            }
+
+            .dpad {
+                display: grid;
+                grid-template-columns: 60px 60px 60px;
+                grid-template-rows: 60px 60px 60px;
+                gap: 4px;
+            }
+
+            .dpad button {
+                /* Prevent all the mobile weirdness */
+                -webkit-user-select: none;
+                user-select: none;
+                -webkit-touch-callout: none;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+
+                font-size: 20px;
+                border: none;
+                border-radius: 8px;
+                background: #444;
+                color: white;
+                cursor: pointer;
+            }
+
+            .dpad button:active,
+            .dpad button.pressed {
+                background: #0af;
+            }
+
+            #up {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            #left {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            #right {
+                grid-column: 3;
+                grid-row: 2;
+            }
+
+            #down {
+                grid-column: 2;
+                grid-row: 3;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Project B | User</h1>
+        <h3 id="connected">(online)</h3>
+
+        <!-- <button id="login">Login with Google</button> -->
+        <div id="buttonGoogle"></div>
+        <br>
+        <button id="logout" display="None">Logout</button>
+        <br>
+        <br><br>
+
+        <input id="deviceID" placeholder="device ID" />
+        <button id="connect">Connect</button>
+        <!-- <button id="con">Con</button> -->
+        <button id="disconnect">Disconnect</button>
+        <br><br>
+        <button id="resetWebRTC">Request remote WebRTC reset</button>
+        <button id="pageReload">Request remote webpage reload</button>
+        <br><br>
+
+        <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea> <br />
+
+        <br><br>
+        <textarea id="allowedEmails" rows="3" cols="50">atul.singh.arora@gmail.com, toatularora@gmail.com</textarea>
+        <br><br>
+        <button id="allowedEmailsUpdate">Update Emails Allowed on the Device</button>
+        <br><br>
+
+        <h3>Local</h3>
+        <video id="local" autoplay muted playsinline></video><br />
+        <button id="muteBtn" onclick="toggleAudio()">Mic On</button>
+        <button id="camBtn" onclick="toggleVideo()">Camera On</button>
+
+        <h3>Remote</h3>
+        <video id="remote" autoplay playsinline></video>
+
+        <h3>ESP32</h3>
+        <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br /><br /><br />
+        <div class="dpadContainer">
+            <div class="dpad">
+                <button id="up">▲</button>
+                <button id="left">◀</button>
+                <button id="right">▶</button>
+                <button id="down">▼</button>
+            </div>
+        </div>
+        <br />
+        <br />
+        <br />
+        <textarea id="messageToESP32" rows="5" cols="60" placeholder="Message to ESP32"></textarea> <br />
+        <button id="btnESP32">Send to ESP32</button> <br />
+
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script>
+
+            const BACKEND = "https://mac.taild17908.ts.net"; //:10000
+            const WS_BACKEND = "wss://mac.taild17908.ts.net";
+
+            connectedEl = document.getElementById("connected");
+            loginEl = document.getElementById("login");
+            logoutEl = document.getElementById("logout");
+
+            statusEl = document.getElementById("regStatus");
+            messageToESP32El = document.getElementById("messageToESP32");
+            allowedEmailsEl = document.getElementById("allowedEmails");
+
+            deviceIDEl = document.getElementById("deviceID");
+            ESP32deviceIDEl = document.getElementById("ESP32deviceID");
+
+            saveddeviceID = localStorage.getItem("deviceID");
+            savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+
+            googleButtonEl = document.getElementById("buttonGoogle");
+
+            if (saveddeviceID) {
+                deviceIDEl.value = saveddeviceID;
+            }
+
+            if (savedESP32deviceID) {
+                ESP32deviceIDEl.value = savedESP32deviceID;
+            }
+
+
+            // document.getElementById("connect").onclick = async () => {
+            //     log(`Reading device names`);
+            //     localStorage.setItem("deviceID", deviceIDEl.value);
+            //     localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+            //     // saveddeviceID = localStorage.getItem("deviceID");
+            //     // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+
+            //     const deviceID = deviceIDEl.value;
+            //     log(`Ensuring the Peer Connection object is ready`)
+            //     await ensurePeerConnection();
+
+            //     const offer = await pc.createOffer();
+            //     await pc.setLocalDescription(offer)
+
+            //     log(`Created an offer.`);
+            //     send({ type: "offer", to: deviceID, sdp: offer });
+            //     log(`Sent an offer to ${deviceID}.`);
+            // }
+
+            let socket;
+            let pc;
+            let localStream;
+            let myEmail;
+
+            // Google Login
+            window.onload = async () => {
+                google.accounts.id.initialize({
+                    client_id: "485427982591-ug9t0vdn3cmu5bh3s9s63h3k6vmpfj45.apps.googleusercontent.com",
+                    callback: handleGoogleLogin
+                });
+
+                google.accounts.id.renderButton(
+                    document.getElementById("buttonGoogle"),
+                    {
+                        theme: "outline",
+                        size: "large"
+                    }
+                );
+
+                // document.getElementById("login").onclick = () => {
+                //     google.accounts.id.prompt();
+                // };
+
+                logoutEl.addEventListener("click", () => {
+                    log("Logging out");
+                    showConnected(false);
+                    localStorage.removeItem("jwt");
+                    googleButtonEl.style.display = "";
+
+                    google.accounts.id.disableAutoSelect();
+                    google.accounts.id.cancel();
+                    // google.accounts.id.disableAutoSelect();                
+                    // google.accounts.id.prompt();
+                });
+
+                const jwt = localStorage.getItem("jwt");
+
+                showConnected(false);
+
+                if (jwt) {
+                    connectWebSocket(jwt);
+                } else {
+                    showConnected(false);
+                }
+
+                // await ensurePeerConnection();
+
+
+                // google.accounts.id.prompt((notification) => {
+                //     log("Google notification:");
+                //     // log(notification.toString());
+                //     if (notification.isNotDisplayed()) {
+                //         log(notification.getNotDisplayedReason());
+                //     }
+
+                //     if (notification.isSkippedMoment()) {
+                //         log(notification.getSkippedReason());
+                //     }
+
+                //     if (notification.isDismissedMoment()) {
+                //         log(notification.getDismissedReason());
+                //     }
+                // });
+            };
+
+            async function handleGoogleLogin(response) {
+                statusEl.value = statusEl.value + `Attempting authentication with Google.\nGoogle sent: ${response.credential}\n`;
+
+                const res = await fetch(`${BACKEND}/auth/google`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ idToken: response.credential })
+                });
+                log(`Response from the server: ${res}\n`);
+
+                const data = await res.json();
+
+                log(`Obtained the following token\n${data.token}`);
+
+                localStorage.setItem("jwt", data.token);
+
+                log(`Trying a websocket connection now.`);
+                connectWebSocket(data.token);
+            }
+
+            // Websocket
+            function connectWebSocket(token) {
+                log(`Websocket connection initiated, using the following token\n${token})`);
+                socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
+
+                socket.onmessage = async (event) => {
+
+                    log(`\nReceived:\n${event.data}`);
+                    // if (msg.Wtype === "offer") {
+                    //     await ensurePeerConnection();
+                    //     await pc.setRemoteDescription(msg.sdp);
+                    //     const answer = await pc.createAnswer();
+                    //     await pc.setLocalDescription(answer);
+                    //     send({ Wtype: "answer", to: msg.from, sdp: answer });
+                    // }
+                    //See if it is JSON
+                    try {
+                        let msg = JSON.parse(event.data);
+                        if (msg.type === "answer") {
+                            log(`\nSetting Remote Description\n${JSON.stringify(msg.sdp)}`);
+                            // await ensurePeerConnection();
+                            await pc.setRemoteDescription(msg.sdp);
+                            log(`\nDone\n`);
+                        }
+
+                        if (msg.type === "ice") {
+                            log(`\nAdding Ice Candidate\n${JSON.stringify(msg.candidate)}`);
+                            // await ensurePeerConnection();
+                            await pc.addIceCandidate(msg.candidate);
+                            log(`\nDone\n`);
+                        }
+                    }
+                    //It is plain text then
+                    catch {
+                        if (event.data == "Authenticated") {
+                            showConnected(true);
+                        }
+                        if (event.data == "Denied") {
+                            showConnected(false);
+                            localStorage.removeItem("jwt");
+                            // google.accounts.id.prompt();
+                        }
+                    }
+
+                };
+
+                socket.onclose = async (event) => {
+                    showConnected(false);
+                }
+            }
+
+            document.getElementById("btnESP32").onclick = async () => {
+                const ESP32deviceID = ESP32deviceIDEl.value;
+                const messageToESP32 = messageToESP32El.value;
+                // const ESP32deviceIDEl
+                send({ Type: "plain", to: ESP32deviceID, payload: messageToESP32 });
+            }
+
+            document.getElementById("resetWebRTC").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                send({ Type: "resetWebRTC", to: deviceID });
+            }
+
+            document.getElementById("pageReload").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                send({ Type: "pageReload", to: deviceID });
+            }
+
+            document.getElementById("allowedEmailsUpdate").onclick = async () => {
+                const deviceID = deviceIDEl.value;
+                const allowedEmails = allowedEmailsEl.value;
+                send({ Type: "allowedEmails", to: deviceID, allowedEmails: allowedEmails });
+            }
+
+
+
+            document.getElementById("disconnect").onclick = async () => {
+                try {
+                    document.getElementById("local").srcObject = null;
+                    await pc.close();
+                    pc = null;
+                    log("Killed the peer connection object.");
+                    if (localStream) {
+                        localStream.getTracks().forEach(track => track.stop());
+                        localStream = null;
+                    }
+                    log("Released the local camera.");
+                    await delay(1000);
+
+                    const deviceID = deviceIDEl.value;
+                    send({ Type: "resetWebRTC", to: deviceID });
+                    log("Requested the remote client to do the same.");
+                }
+                catch {
+                    log("Not on a call.");
+                }
+            }
+
+            document.getElementById("connect").onclick = async () => {
+                log(`Reading device names`);
+                localStorage.setItem("deviceID", deviceIDEl.value);
+                localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+                // saveddeviceID = localStorage.getItem("deviceID");
+                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+
+                const deviceID = deviceIDEl.value;
+                log(`Ensuring the Peer Connection object is ready`)
+                await ensurePeerConnection();
+
+                delay(1000);
+
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer)
+
+                log(`Requesting WebRTC reset on the remote device`);
+                // send({type: "resetWebRTC", to: deviceID});
+                // Doesn't seem to help somehow
+
+                // delay(2000);
+
+                log(`Created an offer.`);
+                send({ type: "offer", to: deviceID, sdp: offer });
+                log(`Sent an offer to ${deviceID}.`);
+            }
+
+            function send(msg) {
+                socket.send(JSON.stringify(msg));
+            }
+
+
+            //TODO: replace currentPeer with deviceID 
+            function currentPeer() {
+                // return document.getElementById("deviceID").value;
+                return deviceIDEl.value;
+            }
+
+            async function ensurePeerConnection() {
+                if (pc) return;
+
+                // localStream = await navigator.mediaDevices.getUserMedia({
+                //     video: true,
+                //     audio: true
+                // });
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    },
+                    video: true
+                });
+
+                document.getElementById("local").srcObject = localStream;
+
+                pc = new RTCPeerConnection({
+                    iceServers: [
+                        { urls: "stun:stun.l.google.com:19302" }
+                    ]
+                });
+
+                localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+
+                pc.ontrack = e => {
+                    document.getElementById("remote").srcObject = e.streams[0];
+                };
+
+                pc.onicecandidate = e => {
+                    if (e.candidate) {
+                        send({ type: "ice", to: currentPeer(), candidate: e.candidate });
+                    }
+                };
+            }
+
+            function log(str) {
+                statusEl.value = statusEl.value + str + "\n";
+                statusEl.scrollTop = statusEl.scrollHeight;
+                // console.log(str);
+            }
+
+        </script>
+
+        <script>
+            function showConnected(status = true) {
+                if (status) {
+                    connectedEl.style.display = "";
+                    googleButtonEl.style.display = "none";
+                    // loginEl.style.display = "";
+                }
+                else {
+                    googleButtonEl.style.display = "";
+                    connectedEl.style.display = "none";
+                }
+            }
+        </script>
+
+        <script>
+            let videoEnabled = true;
+            let audioEnabled = true;
+
+            muteBtnEl = document.getElementById("muteBtn")
+            camBtnEl = document.getElementById("camBtn")
+
+            function toggleVideo() {
+                videoEnabled = !videoEnabled;
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = videoEnabled;
+                });
+                if (videoEnabled)
+                    camBtnEl.textContent = "Camera On";
+                else
+                    camBtnEl.textContent = "Camera Off";
+            }
+
+            function toggleAudio() {
+                audioEnabled = !audioEnabled;
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = audioEnabled;
+                });
+                if (audioEnabled)
+                    muteBtn.textContent = "Mic On";
+                else
+                    muteBtn.textContent = "Mic Off";
+
+            }            
+        </script>
+
+
+        <script>
+            const directions = ['up', 'down', 'left', 'right'];
+
+            function move(dir, isPressed) {
+                console.log(dir, isPressed ? 'pressed' : 'released');
+
+                const ESP32deviceID = ESP32deviceIDEl.value;
+                // const messageToESP32 = messageToESP32El.value;
+                // const ESP32deviceIDEl
+                send({ Type: "cmd", to: ESP32deviceID, payload: { dir, isPressed } });
+
+                // Hook your game logic here, e.g.:
+                // if (isPressed) player.startMoving(dir); else player.stopMoving(dir);
+
+            }
+
+            directions.forEach(dir => {
+                const btn = document.getElementById(dir);
+
+                const start = (e) => {
+                    e.preventDefault(); // stops synthetic mouse events + long-press menu
+                    btn.classList.add('pressed');
+                    move(dir, true);
+                };
+
+                const end = (e) => {
+                    e.preventDefault();
+                    btn.classList.remove('pressed');
+                    move(dir, false);
+                };
+
+                btn.addEventListener('touchstart', start, { passive: false });
+                btn.addEventListener('touchend', end);
+                btn.addEventListener('touchcancel', end);
+
+                // Fallback for desktop/mouse testing
+                btn.addEventListener('mousedown', start);
+                btn.addEventListener('mouseup', end);
+                btn.addEventListener('mouseleave', end);
+            });
+
+
+            // --- Keyboard bindings ---
+            const keyMap = {
+                ArrowUp: 'up',
+                ArrowDown: 'down',
+                ArrowLeft: 'left',
+                ArrowRight: 'right',
+                // Optional WASD support:
+                // w: 'up', a: 'left', s: 'down', d: 'right',
+                // W: 'up', A: 'left', S: 'down', D: 'right',
+            };
+
+            window.addEventListener('keydown', (e) => {
+                const dir = keyMap[e.key];
+                if (!dir) return;
+
+                e.preventDefault(); // stop page scrolling on arrow keys
+
+                if (e.repeat) return; // ignore OS auto-repeat, treat as one continuous press
+
+                document.getElementById(dir).classList.add('pressed');
+                move(dir, true);
+            });
+
+            window.addEventListener('keyup', (e) => {
+                const dir = keyMap[e.key];
+                if (!dir) return;
+
+                document.getElementById(dir).classList.remove('pressed');
+                move(dir, false);
+            });
+
+
+            let remoteVideoEl = document.getElementById("remote")
+            let localVideoEl = document.getElementById("local")
+
+            remoteVideoEl.addEventListener("click", () => toggleFullscreen(remoteVideoEl));
+            localVideoEl.addEventListener("click", () => toggleFullscreen(localVideoEl));
+
+            async function toggleFullscreen(fullEl) {
+                try {
+                    if (document.fullscreenElement) {
+                        await document.exitFullscreen();
+                    } else {
+                        await fullEl.requestFullscreen();
+                        await fullEl.webkitEnterFullscreen();
+                    }
+                } catch (err) {
+                    console.error("Fullscreen failed:", err);
+                }
+            }
+
+            //     remoteVideo.addEventListener("click", async () => {
+            // if (remoteVideo.requestFullscreen) {
+            //     await remoteVideo.requestFullscreen();
+            // } else if (remoteVideo.webkitEnterFullscreen) {
+            //     remoteVideo.webkitEnterFullscreen();
+            // }
+            // });
+
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        </script>
+
+    </body>
+
+    </html>
