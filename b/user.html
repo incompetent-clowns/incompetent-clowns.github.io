@@ -220,24 +220,24 @@
                     showConnected(false);
                 }
 
-                await ensurePeerConnection();
+                // await ensurePeerConnection();
 
 
-                google.accounts.id.prompt((notification) => {
-                    log("Google notification:");
-                    // log(notification.toString());
-                    if (notification.isNotDisplayed()) {
-                        log(notification.getNotDisplayedReason());
-                    }
+                // google.accounts.id.prompt((notification) => {
+                //     log("Google notification:");
+                //     // log(notification.toString());
+                //     if (notification.isNotDisplayed()) {
+                //         log(notification.getNotDisplayedReason());
+                //     }
 
-                    if (notification.isSkippedMoment()) {
-                        log(notification.getSkippedReason());
-                    }
+                //     if (notification.isSkippedMoment()) {
+                //         log(notification.getSkippedReason());
+                //     }
 
-                    if (notification.isDismissedMoment()) {
-                        log(notification.getDismissedReason());
-                    }
-                });
+                //     if (notification.isDismissedMoment()) {
+                //         log(notification.getDismissedReason());
+                //     }
+                // });
             };
 
             async function handleGoogleLogin(response) {
@@ -260,7 +260,7 @@
                 connectWebSocket(data.token);
             }
 
-            Websocket
+            // Websocket
             function connectWebSocket(token) {
                 log(`Websocket connection initiated, using the following token\n${token})`);
                 socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
@@ -369,8 +369,15 @@
                 log(`Ensuring the Peer Connection object is ready`)
                 await ensurePeerConnection();
 
+                delay(500);
+
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer)
+
+                log(`Requesting WebRTC reset on the remote device`);
+                send({type: "resetWebRTC", to: deviceID});
+
+                delay(2000);
 
                 log(`Created an offer.`);
                 send({ type: "offer", to: deviceID, sdp: offer });
