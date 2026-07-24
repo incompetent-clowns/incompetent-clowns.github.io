@@ -77,7 +77,8 @@
         <h1>Project B | User</h1>
         <h3 id="connected">(online)</h3>
 
-        <button id="login">Login with Google</button>
+        <!-- <button id="login">Login with Google</button> -->
+        <div id="buttonGoogle"></div>
         <button id="logout" display="None">Logout</button>
         <br>
         <br><br>
@@ -143,6 +144,7 @@
             saveddeviceID = localStorage.getItem("deviceID");
             savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
+            googleButtonEl = document.getElementById("buttonGoogle");
 
             if (saveddeviceID) {
                 deviceIDEl.value = saveddeviceID;
@@ -184,18 +186,28 @@
                     callback: handleGoogleLogin
                 });
 
-                document.getElementById("login").onclick = () => {
-                    google.accounts.id.prompt();
-                };
+                google.accounts.id.renderButton(
+                    document.getElementById("buttonGoogle"),
+                    {
+                        theme: "outline",
+                        size: "large"
+                    }
+                );
+
+                // document.getElementById("login").onclick = () => {
+                //     google.accounts.id.prompt();
+                // };
 
                 logoutEl.addEventListener("click", () => {
                     log("Logging out");
                     showConnected(false);
                     localStorage.removeItem("jwt");
+                    googleButtonEl.style.display = "";
+
                     google.accounts.id.disableAutoSelect();
                     google.accounts.id.cancel();
                     // google.accounts.id.disableAutoSelect();                
-                    google.accounts.id.prompt();
+                    // google.accounts.id.prompt();
                 });
 
                 const jwt = localStorage.getItem("jwt");
@@ -248,7 +260,7 @@
                 connectWebSocket(data.token);
             }
 
-            Websocket 
+            Websocket
             function connectWebSocket(token) {
                 log(`Websocket connection initiated, using the following token\n${token})`);
                 socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
@@ -346,7 +358,7 @@
                 }
             }
 
-            document.getElementById("connect").onclick = async () => {            
+            document.getElementById("connect").onclick = async () => {
                 log(`Reading device names`);
                 localStorage.setItem("deviceID", deviceIDEl.value);
                 localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
@@ -415,7 +427,7 @@
 
             function log(str) {
                 statusEl.value = statusEl.value + str + "\n";
-                // statusEl.scrollTop = statusEl.scrollHeight;
+                statusEl.scrollTop = statusEl.scrollHeight;
                 // console.log(str);
             }
 
@@ -425,9 +437,11 @@
             function showConnected(status = true) {
                 if (status) {
                     connectedEl.style.display = "";
+                    googleButtonEl.style.display = "none";
                     // loginEl.style.display = "";
                 }
                 else {
+                    googleButtonEl.style.display = "";
                     connectedEl.style.display = "none";
                 }
             }
