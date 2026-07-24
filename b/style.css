@@ -231,3 +231,63 @@ video {
     font-size: 0.95rem;
   }
 }
+
+
+/* -------------------- dpad --------------------------*/
+.dpadContainer {
+  margin: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: page-width;
+  /* background: #222; */
+  /* gap: 10px; */
+}
+
+.dpad {
+  display: grid;
+  grid-template-columns: 60px 60px 60px;
+  grid-template-rows: 60px 60px 60px;
+  gap: 4px;
+}
+
+.dpad button {
+  /* Prevent all the mobile weirdness */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  font-size: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #444;
+  color: white;
+  cursor: pointer;
+}
+
+.dpad button:active,
+.dpad button.pressed {
+  background: #0af;
+}
+
+#up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+#down {
+  grid-column: 2;
+  grid-row: 3;
+}

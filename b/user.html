@@ -46,8 +46,8 @@
             <h3>Local</h3>
             <video id="local" autoplay muted playsinline></video>
             <div class="row">
-                <button id="muteBtn">Mic On</button>
-                <button id="camBtn">Camera On</button>
+                <button id="muteBtn"  onclick="toggleAudio()">Mic On</button>
+                <button id="camBtn" onclick="">Camera On</button>
             </div>
         </div>
 
@@ -57,21 +57,20 @@
         </div>
     </div>
 
-    <div class="panel-section">
+    <div class="panel-section video-group">
 
     <h3>ESP32</h3>
     <input id="ESP32deviceID" placeholder="ESP32 device ID" /> <br /><br /><br />
-        <div class="row">
-            
+        <div class="video-block">
+            <div class="dpadContainer">
+                <div class="dpad">
+                    <button id="up">▲</button>
+                    <button id="left">◀</button>
+                    <button id="right">▶</button>
+                    <button id="down">▼</button>
+                </div>
+            </div>
         </div>
-    <div class="dpadContainer">
-        <div class="dpad">
-            <button id="up">▲</button>
-            <button id="left">◀</button>
-            <button id="right">▶</button>
-            <button id="down">▼</button>
-        </div>
-    </div>
 
     <div class="row">
         <textarea id="messageToESP32" rows="5" cols="60" placeholder="Message to ESP32"></textarea> <br />
