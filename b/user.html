@@ -152,6 +152,26 @@
                 ESP32deviceIDEl.value = savedESP32deviceID;
             }
 
+
+            document.getElementById("connect").onclick = async () => {            
+                log(`Reading device names`);
+                localStorage.setItem("deviceID", deviceIDEl.value);
+                localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+                // saveddeviceID = localStorage.getItem("deviceID");
+                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+
+                const deviceID = deviceIDEl.value;
+                log(`Ensuring the Peer Connection object is ready`)
+                await ensurePeerConnection();
+
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer)
+                
+                log(`Created an offer.`);
+                send({ type: "offer", to: deviceID, sdp: offer });
+                log(`Sent an offer to ${deviceID}.`);
+            }
+
             let socket;
             let pc;
             let localStream;
@@ -315,24 +335,24 @@
                 }
             }
 
-            document.getElementById("connect").onclick = async () => {            
-                log(`Reading device names`);
-                localStorage.setItem("deviceID", deviceIDEl.value);
-                localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
-                // saveddeviceID = localStorage.getItem("deviceID");
-                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+            // document.getElementById("connect").onclick = async () => {            
+            //     log(`Reading device names`);
+            //     localStorage.setItem("deviceID", deviceIDEl.value);
+            //     localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+            //     // saveddeviceID = localStorage.getItem("deviceID");
+            //     // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
-                const deviceID = deviceIDEl.value;
-                log(`Ensuring the Peer Connection object is ready`)
-                await ensurePeerConnection();
+            //     const deviceID = deviceIDEl.value;
+            //     log(`Ensuring the Peer Connection object is ready`)
+            //     await ensurePeerConnection();
 
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer)
+            //     const offer = await pc.createOffer();
+            //     await pc.setLocalDescription(offer)
                 
-                log(`Created an offer.`);
-                send({ type: "offer", to: deviceID, sdp: offer });
-                log(`Sent an offer to ${deviceID}.`);
-            }
+            //     log(`Created an offer.`);
+            //     send({ type: "offer", to: deviceID, sdp: offer });
+            //     log(`Sent an offer to ${deviceID}.`);
+            // }
 
             function send(msg) {
                 socket.send(JSON.stringify(msg));
