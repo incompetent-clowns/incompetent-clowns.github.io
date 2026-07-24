@@ -99,9 +99,9 @@
         <br><br>
 
         <h3>Local</h3>
-        <video id="local" autoplay muted playsinline></video><br/>
+        <video id="local" autoplay muted playsinline></video><br />
         <button id="muteBtn" onclick="toggleAudio()">Mic On</button>
-        <button id="camBtn" onclick="toggleVideo()">Camera On</button> 
+        <button id="camBtn" onclick="toggleVideo()">Camera On</button>
 
         <h3>Remote</h3>
         <video id="remote" autoplay playsinline></video>
@@ -180,6 +180,11 @@
 
             };
 
+            google.accounts.id.prompt((notification) => {
+                log("Google Said:")
+                log(notification);
+            })
+
             async function handleGoogleLogin(response) {
                 statusEl.value = statusEl.value + `Attempting authentication with Google.\nGoogle sent: ${response.credential}\n`
 
@@ -200,23 +205,32 @@
                 connectWebSocket(data.token);
             }
 
+            logoutEl.addEventListener("click", () => {
+                showConnected(false);
+                localStorage.removeItem("jwt");
+                google.accounts.id.disableAutoSelect();
+                google.accounts.id.cancel();
+                // google.accounts.id.disableAutoSelect();                
+                google.accounts.id.prompt();
+            })
+
             // Websocket 
             function connectWebSocket(token) {
                 statusEl.value = statusEl.value + `Websocket connection initiated, using the following token\n${token}`
                 socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
 
                 socket.onmessage = async (event) => {
-                    
+
                     statusEl.value = statusEl.value + `\nReceived:\n${event.data}`;
                     // if (msg.Wtype === "offer") {
-                        //     await ensurePeerConnection();
-                        //     await pc.setRemoteDescription(msg.sdp);
-                        //     const answer = await pc.createAnswer();
-                        //     await pc.setLocalDescription(answer);
-                        //     send({ Wtype: "answer", to: msg.from, sdp: answer });
-                        // }
+                    //     await ensurePeerConnection();
+                    //     await pc.setRemoteDescription(msg.sdp);
+                    //     const answer = await pc.createAnswer();
+                    //     await pc.setLocalDescription(answer);
+                    //     send({ Wtype: "answer", to: msg.from, sdp: answer });
+                    // }
                     //See if it is JSON
-                    try{
+                    try {
                         let msg = JSON.parse(event.data);
                         if (msg.type === "answer") {
                             statusEl.value = statusEl.value + `\nSetting Remote Description\n${JSON.stringify(msg.sdp)}`;
@@ -224,18 +238,23 @@
                             await pc.setRemoteDescription(msg.sdp);
                             statusEl.value = statusEl.value + `\nDone\n`;
                         }
-    
+
                         if (msg.type === "ice") {
                             statusEl.value = statusEl.value + `\nAdding Ice Candidate\n${JSON.stringify(msg.candidate)}`;
                             // await ensurePeerConnection();
                             await pc.addIceCandidate(msg.candidate);
                             statusEl.value = statusEl.value + `\nDone\n`;
                         }
-                    }    
+                    }
                     //It is plain text then
-                    catch{
-                        if (event.data == "Authenticated"){
+                    catch {
+                        if (event.data == "Authenticated") {
                             showConnected(true);
+                        }
+                        if (event.data == "Denied") {
+                            showConnected(false);
+                            localStorage.removeItem("jwt");
+                            // google.accounts.id.prompt();
                         }
                     }
 
@@ -362,13 +381,13 @@
 
         </script>
 
-        <script>    
-            function showConnected(status = true){                
-                if(status){
+        <script>
+            function showConnected(status = true) {
+                if (status) {
                     connectedEl.style.display = "";
                     // loginEl.style.display = "";
                 }
-                else{
+                else {
                     connectedEl.style.display = "none";
                 }
             }
@@ -386,9 +405,9 @@
                 localStream.getVideoTracks().forEach(track => {
                     track.enabled = videoEnabled;
                 });
-                if(videoEnabled)
-                    camBtnEl.textContent = "Camera On"; 
-                else   
+                if (videoEnabled)
+                    camBtnEl.textContent = "Camera On";
+                else
                     camBtnEl.textContent = "Camera Off";
             }
 
@@ -397,9 +416,9 @@
                 localStream.getAudioTracks().forEach(track => {
                     track.enabled = audioEnabled;
                 });
-                if(audioEnabled)
-                    muteBtn.textContent = "Mic On"; 
-                else   
+                if (audioEnabled)
+                    muteBtn.textContent = "Mic On";
+                else
                     muteBtn.textContent = "Mic Off";
 
             }            
