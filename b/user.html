@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <h1>Project B | User</h1>
+    <h1>Project B » User</h1>
     <h3 id="connected">(online)
         <div id="buttonGoogle"></div>
         <button id="logout" display="">Logout</button>
@@ -45,13 +45,14 @@
         <div class="video-block">
             <h3>Local</h3>
             <video id="local" autoplay muted playsinline></video>
+            <br/><br/><br/>
             <div class="row">
                 <button id="muteBtn"  onclick="toggleAudio()">Mic On</button>
-                <button id="camBtn" onclick="">Camera On</button>
+                <button id="camBtn" onclick="toggleVideo()">Camera On</button>
             </div>
         </div>
 
-        <div class="video-block">
+        <div class="video-block-wide">
             <h3>Remote</h3>
             <video id="remote" autoplay playsinline></video>
         </div>
