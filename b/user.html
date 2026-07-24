@@ -99,6 +99,7 @@
 
         saveddeviceID = localStorage.getItem("deviceID");
         savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+        
 
         googleButtonEl = document.getElementById("buttonGoogle");
 
@@ -344,6 +345,7 @@
 
         function send(msg) {
             socket.send(JSON.stringify(msg));
+            log(`Sent:\n ${JSON.stringify(msg)}`);
         }
 
 
