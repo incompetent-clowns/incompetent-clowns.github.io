@@ -84,6 +84,7 @@
 
         <input id="deviceID" placeholder="device ID" />
         <button id="connect">Connect</button>
+        <button id="con">Con</button>
         <button id="disconnect">Disconnect</button>
         <br><br>
         <button id="resetWebRTC">Request remote WebRTC reset</button>
@@ -310,24 +311,27 @@
                     log("Requested the remote client to do the same.");
                 }
                 catch {
-                    log("Not on a call.")
+                    log("Not on a call.");
                 }
             }
 
-            document.getElementById("connect").onclick = async () => {
-                localStorage.setItem("deviceID", deviceIDEl.value);
-                localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
-                // saveddeviceID = localStorage.getItem("deviceID");
-                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+            document.getElementById("con").onclick = async () => {            
+                log(`Reading device names`);
+                // localStorage.setItem("deviceID", deviceIDEl.value);
+                // localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+                // // saveddeviceID = localStorage.getItem("deviceID");
+                // // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
-                const deviceID = deviceIDEl.value;
-                await ensurePeerConnection();
+                // const deviceID = deviceIDEl.value;
+                // log(`Ensuring the Peer Connection object is ready`)
+                // await ensurePeerConnection();
 
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer)
-
-                send({ type: "offer", to: deviceID, sdp: offer });
-                log(`Sent an offer to ${deviceID}`);
+                // const offer = await pc.createOffer();
+                // await pc.setLocalDescription(offer)
+                
+                // log(`Created an offer.`);
+                // send({ type: "offer", to: deviceID, sdp: offer });
+                // log(`Sent an offer to ${deviceID}.`);
             }
 
             function send(msg) {
@@ -381,6 +385,7 @@
             function log(str) {
                 statusEl.value = statusEl.value + str + "\n";
                 statusEl.scrollTop = statusEl.scrollHeight;
+                console.log(str);
             }
 
         </script>
