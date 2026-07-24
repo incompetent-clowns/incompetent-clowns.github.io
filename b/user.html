@@ -84,7 +84,7 @@
 
         <input id="deviceID" placeholder="device ID" />
         <button id="connect">Connect</button>
-        <button id="con">Con</button>
+        <!-- <button id="con">Con</button> -->
         <button id="disconnect">Disconnect</button>
         <br><br>
         <button id="resetWebRTC">Request remote WebRTC reset</button>
@@ -193,7 +193,7 @@
             };
 
             google.accounts.id.prompt((notification) => {
-                log("Google Said:")
+                log("Google Said:");
                 log(notification);
             })
 
@@ -303,7 +303,7 @@
                         localStream.getTracks().forEach(track => track.stop());
                         localStream = null;
                     }
-                    log("Released the local camera.")
+                    log("Released the local camera.");
                     await delay(1000);
 
                     const deviceID = deviceIDEl.value;
@@ -315,23 +315,23 @@
                 }
             }
 
-            document.getElementById("con").onclick = async () => {            
+            document.getElementById("connect").onclick = async () => {            
                 log(`Reading device names`);
-                // localStorage.setItem("deviceID", deviceIDEl.value);
-                // localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
-                // // saveddeviceID = localStorage.getItem("deviceID");
-                // // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
+                localStorage.setItem("deviceID", deviceIDEl.value);
+                localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
+                // saveddeviceID = localStorage.getItem("deviceID");
+                // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
 
-                // const deviceID = deviceIDEl.value;
-                // log(`Ensuring the Peer Connection object is ready`)
-                // await ensurePeerConnection();
+                const deviceID = deviceIDEl.value;
+                log(`Ensuring the Peer Connection object is ready`)
+                await ensurePeerConnection();
 
-                // const offer = await pc.createOffer();
-                // await pc.setLocalDescription(offer)
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer)
                 
-                // log(`Created an offer.`);
-                // send({ type: "offer", to: deviceID, sdp: offer });
-                // log(`Sent an offer to ${deviceID}.`);
+                log(`Created an offer.`);
+                send({ type: "offer", to: deviceID, sdp: offer });
+                log(`Sent an offer to ${deviceID}.`);
             }
 
             function send(msg) {
@@ -384,8 +384,8 @@
 
             function log(str) {
                 statusEl.value = statusEl.value + str + "\n";
-                statusEl.scrollTop = statusEl.scrollHeight;
-                console.log(str);
+                // statusEl.scrollTop = statusEl.scrollHeight;
+                // console.log(str);
             }
 
         </script>
