@@ -75,7 +75,7 @@
 
     <body>
         <h1>Project B | User</h1>
-        <h3 id="connected" display="false">(online)</h3>
+        <h3 id="connected">(online)</h3>
 
         <button id="login">Login with Google</button>
         <br>
@@ -127,6 +127,8 @@
             const BACKEND = "https://mac.taild17908.ts.net"; //:10000
             const WS_BACKEND = "wss://mac.taild17908.ts.net";
 
+            connectedEl = document.getElementById("connected");
+
             statusEl = document.getElementById("regStatus");
             messageToESP32El = document.getElementById("messageToESP32");
             allowedEmailsEl = document.getElementById("allowedEmails");
@@ -167,7 +169,7 @@
                 if (jwt) {
                     connectWebSocket(jwt);
                 } else {
-                    showConnected();
+                    showConnected(false);
                 }
 
                 await ensurePeerConnection();
@@ -223,6 +225,10 @@
                         // await ensurePeerConnection();
                         await pc.addIceCandidate(msg.candidate);
                         statusEl.value = statusEl.value + `\nDone\n`;
+                    }
+
+                    if (msg == "Authenticated"){
+                        showConnected(true);
                     }
                 };
 
@@ -348,8 +354,7 @@
         </script>
 
         <script>    
-            function showConnected(status = true){
-                connectedEl = document.getElementById("connected")
+            function showConnected(status = true){                
                 if(status){
                     connectedEl.style.display = "";
                 }
