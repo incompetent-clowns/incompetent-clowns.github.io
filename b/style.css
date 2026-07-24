@@ -78,7 +78,7 @@ h3 {
 }
 
 br {
-  display: none;
+  display: "";
 }
 
 /* ---------- Lists ---------- */
@@ -100,6 +100,29 @@ ul li::marker {
  
 ul li:last-child {
   margin-bottom: 0;
+}
+
+/* ---------- Links ---------- */
+a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-decoration-color: rgba(169, 189, 216, 0.4);
+  text-underline-offset: 2px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+ 
+a:hover {
+  color: #c7d6ea;
+  text-decoration-color: currentColor;
+}
+ 
+a:visited {
+  color: #9d8ec2;
+}
+ 
+a:focus-visible {
+  outline: 1.5px solid var(--accent-strong);
+  outline-offset: 2px;
 }
 
 /* ---------- Layout groups ---------- */

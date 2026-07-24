@@ -20,7 +20,8 @@
     <div class="panel-section">
 
         <div class="row">
-            <input id="deviceID" placeholder="device ID" /><br /><br /><br />
+            <input id="deviceID" placeholder="device ID" />
+            <!-- <br/><br/><br /> -->
             <button id="connect">Connect</button>
             <button id="disconnect">Disconnect</button>
         </div>
@@ -29,7 +30,7 @@
             <button id="resetWebRTC">Request remote WebRTC reset</button>
             <button id="pageReload">Request remote webpage reload</button>
         </div>
-
+        <br/>
         <textarea id="regStatus" rows="5" cols="60" placeholder="Status" readonly></textarea>
     </div>
 
@@ -44,7 +45,7 @@
         <div class="video-block">
             <h3>Local</h3>
             <video id="local" autoplay muted playsinline></video>
-            <br/><br/><br/>
+            <br/>
             <div class="row">
                 <button id="muteBtn"  onclick="toggleAudio()">Mic On</button>
                 <button id="camBtn" onclick="toggleVideo()">Camera On</button>
