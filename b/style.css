@@ -46,6 +46,15 @@ h1 {
   letter-spacing: -0.01em;
 }
 
+h2 {
+  font-size: 1.2rem;
+  font-weight: 200;
+  color: var(--text-dim);
+  margin: 1.4rem 0 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 h3 {
   font-size: 0.72rem;
   font-weight: 600;

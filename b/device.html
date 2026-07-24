@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Project B | Device </title>
+    <title>Project B » device </title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-    <h1>Project B | Device</h1>
+    <h1><a href="./index.html">Project B</a> » device</h1>
     <h3>Register Device (need to do this only once)</h3>
 
     <button id="regen">Generate New Keypair</button>
@@ -504,6 +505,7 @@
 
         function log(str) {
             authStatusEl.value = authStatusEl.value + str + "\n";
+            authStatusEl.scrollTop = authStatusEl.scrollHeight;
         }
 
     </script>
