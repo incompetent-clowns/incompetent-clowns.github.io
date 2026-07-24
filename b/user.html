@@ -78,6 +78,7 @@
         <h3 id="connected">(online)</h3>
 
         <button id="login">Login with Google</button>
+        <button id="logout" display="None">Logout</button>
         <br>
         <br><br>
 
@@ -128,6 +129,8 @@
             const WS_BACKEND = "wss://mac.taild17908.ts.net";
 
             connectedEl = document.getElementById("connected");
+            loginEl = document.getElementById("login");
+            logoutEl = document.getElementById("logout");
 
             statusEl = document.getElementById("regStatus");
             messageToESP32El = document.getElementById("messageToESP32");
@@ -166,6 +169,7 @@
 
                 const jwt = localStorage.getItem("jwt");
 
+                showConnected(false);
                 if (jwt) {
                     connectWebSocket(jwt);
                 } else {
@@ -202,34 +206,39 @@
                 socket = new WebSocket(`${WS_BACKEND}?token=${token}`);
 
                 socket.onmessage = async (event) => {
-                    let msg = JSON.parse(event.data);
-
+                    
                     statusEl.value = statusEl.value + `\nReceived:\n${event.data}`;
                     // if (msg.Wtype === "offer") {
-                    //     await ensurePeerConnection();
-                    //     await pc.setRemoteDescription(msg.sdp);
-                    //     const answer = await pc.createAnswer();
-                    //     await pc.setLocalDescription(answer);
-                    //     send({ Wtype: "answer", to: msg.from, sdp: answer });
-                    // }
-
-                    if (msg.type === "answer") {
-                        statusEl.value = statusEl.value + `\nSetting Remote Description\n${JSON.stringify(msg.sdp)}`;
-                        // await ensurePeerConnection();
-                        await pc.setRemoteDescription(msg.sdp);
-                        statusEl.value = statusEl.value + `\nDone\n`;
+                        //     await ensurePeerConnection();
+                        //     await pc.setRemoteDescription(msg.sdp);
+                        //     const answer = await pc.createAnswer();
+                        //     await pc.setLocalDescription(answer);
+                        //     send({ Wtype: "answer", to: msg.from, sdp: answer });
+                        // }
+                    //See if it is JSON
+                    try{
+                        let msg = JSON.parse(event.data);
+                        if (msg.type === "answer") {
+                            statusEl.value = statusEl.value + `\nSetting Remote Description\n${JSON.stringify(msg.sdp)}`;
+                            // await ensurePeerConnection();
+                            await pc.setRemoteDescription(msg.sdp);
+                            statusEl.value = statusEl.value + `\nDone\n`;
+                        }
+    
+                        if (msg.type === "ice") {
+                            statusEl.value = statusEl.value + `\nAdding Ice Candidate\n${JSON.stringify(msg.candidate)}`;
+                            // await ensurePeerConnection();
+                            await pc.addIceCandidate(msg.candidate);
+                            statusEl.value = statusEl.value + `\nDone\n`;
+                        }
+                    }    
+                    //It is plain text then
+                    catch{
+                        if (event.data == "Authenticated"){
+                            showConnected(true);
+                        }
                     }
 
-                    if (msg.type === "ice") {
-                        statusEl.value = statusEl.value + `\nAdding Ice Candidate\n${JSON.stringify(msg.candidate)}`;
-                        // await ensurePeerConnection();
-                        await pc.addIceCandidate(msg.candidate);
-                        statusEl.value = statusEl.value + `\nDone\n`;
-                    }
-
-                    if (msg == "Authenticated"){
-                        showConnected(true);
-                    }
                 };
 
                 socket.onclose = async (event) => {
@@ -357,6 +366,7 @@
             function showConnected(status = true){                
                 if(status){
                     connectedEl.style.display = "";
+                    // loginEl.style.display = "";
                 }
                 else{
                     connectedEl.style.display = "none";
