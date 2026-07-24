@@ -167,6 +167,16 @@
                     google.accounts.id.prompt();
                 };
 
+                logoutEl.addEventListener("click", () => {
+                    log("Logging out");
+                    showConnected(false);
+                    localStorage.removeItem("jwt");
+                    google.accounts.id.disableAutoSelect();
+                    google.accounts.id.cancel();
+                    // google.accounts.id.disableAutoSelect();                
+                    google.accounts.id.prompt();
+                });
+
                 const jwt = localStorage.getItem("jwt");
 
                 showConnected(false);
@@ -204,15 +214,6 @@
                 statusEl.value = statusEl.value + `Trying a websocket connection now.`;
                 connectWebSocket(data.token);
             }
-
-            logoutEl.addEventListener("click", () => {
-                showConnected(false);
-                localStorage.removeItem("jwt");
-                google.accounts.id.disableAutoSelect();
-                google.accounts.id.cancel();
-                // google.accounts.id.disableAutoSelect();                
-                google.accounts.id.prompt();
-            })
 
             // Websocket 
             function connectWebSocket(token) {
