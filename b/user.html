@@ -79,6 +79,7 @@
 
         <!-- <button id="login">Login with Google</button> -->
         <div id="buttonGoogle"></div>
+        <br>
         <button id="logout" display="None">Logout</button>
         <br>
         <br><br>
@@ -369,15 +370,16 @@
                 log(`Ensuring the Peer Connection object is ready`)
                 await ensurePeerConnection();
 
-                delay(500);
+                delay(1000);
 
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(offer)
 
                 log(`Requesting WebRTC reset on the remote device`);
-                send({type: "resetWebRTC", to: deviceID});
+                // send({type: "resetWebRTC", to: deviceID});
+                // Doesn't seem to help somehow
 
-                delay(2000);
+                // delay(2000);
 
                 log(`Created an offer.`);
                 send({ type: "offer", to: deviceID, sdp: offer });
