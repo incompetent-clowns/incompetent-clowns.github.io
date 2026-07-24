@@ -81,6 +81,27 @@ br {
   display: none;
 }
 
+/* ---------- Lists ---------- */
+ul {
+  margin: 0.5rem 0 1rem;
+  padding-left: 1.1rem;
+  color: var(--text);
+}
+ 
+ul li {
+  margin-bottom: 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+ 
+ul li::marker {
+  color: var(--text-dim);
+}
+ 
+ul li:last-child {
+  margin-bottom: 0;
+}
+
 /* ---------- Layout groups ---------- */
 .panel-section {
   background: var(--panel);
