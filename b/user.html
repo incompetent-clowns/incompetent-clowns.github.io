@@ -75,7 +75,7 @@
 
     <body>
         <h1>Project B | User</h1>
-        <h3 id="connected">(connected)</h3>
+        <h3 id="connected" display="false">(online)</h3>
 
         <button id="login">Login with Google</button>
         <br>
@@ -225,6 +225,10 @@
                         statusEl.value = statusEl.value + `\nDone\n`;
                     }
                 };
+
+                socket.onclose = async (event) => {
+                    showConnected(false);
+                }
             }
 
             document.getElementById("btnESP32").onclick = async () => {
@@ -279,8 +283,6 @@
                 localStorage.setItem("ESP32deviceID", ESP32deviceIDEl.value);
                 // saveddeviceID = localStorage.getItem("deviceID");
                 // savedESP32deviceID = localStorage.getItem("ESP32deviceID");
-
-
 
                 const deviceID = deviceIDEl.value;
                 await ensurePeerConnection();
@@ -346,7 +348,15 @@
         </script>
 
         <script>    
-            show
+            function showConnected(status = true){
+                connectedEl = document.getElementById("connected")
+                if(status){
+                    connectedEl.style.display = "";
+                }
+                else{
+                    connectedEl.style.display = "none";
+                }
+            }
         </script>
 
         <script>
