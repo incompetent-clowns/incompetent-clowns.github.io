@@ -21,8 +21,10 @@ static const uint8_t SPKI_PREFIX[] = {
 ////////////////////////
 #include <WiFi.h>
 #include <WebSocketsClient.h>
-const char *ssid = "Airtel_7000000000";
-const char *password = "air81588";
+const char *ssid = "TP-Link_5DBC_2.4GHz";
+const char *password = "20059132";
+// const char *ssid = "Airtel_7000000000";
+// const char *password = "air81588";
 
 WebSocketsClient ws;
 ///////////////////////////
@@ -46,10 +48,15 @@ mbedtls_ctr_drbg_context ctr;
 // const int in2 = 25;
 // const int in3 = 33;
 // const int in4 = 32;
-const int in1 = 4;
-const int in2 = 5;
-const int in3 = 6;
-const int in4 = 7;
+// const int in1 = 4;
+// const int in2 = 5;
+// const int in3 = 6;
+// const int in4 = 7;
+
+const int in1 = 26;
+const int in2 = 25;
+const int in3 = 33;
+const int in4 = 32;
 
 
 void printHex(const uint8_t *data, size_t len)
@@ -364,7 +371,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     response["Type"] = "device";
                     JsonObject device_ = response["device"].to<JsonObject>();
                     device_["publicKey"] = getPublicKeySPKI(); //"Working on it";
-                    device_["id"] = "ESP32-1";
+                    device_["id"] = "ESP32-H";
                     device_["signature"] = signMessage(str_challenge); //"Working on it";
                     device_["Type"] = "ESP32";
                     String str_response;
