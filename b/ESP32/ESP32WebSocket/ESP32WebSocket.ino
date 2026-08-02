@@ -507,7 +507,7 @@ void setup()
     pinMode(in3, OUTPUT);
     pinMode(in4, OUTPUT);
 
-    Serial.println("Motor pins configured.")
+    Serial.println("Motor pins configured.");
 
 
 
