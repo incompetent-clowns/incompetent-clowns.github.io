@@ -54,8 +54,10 @@ mbedtls_ctr_drbg_context ctr;
 // const int in4 = 7;
 
 // const int in1 = 26;
+const int in1 = 33;
 const int in2 = 25;
 // const int in3 = 33;
+const int in3 = 26;
 const int in4 = 32;
 
 
