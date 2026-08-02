@@ -382,10 +382,10 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                     ws.sendTXT(str_response);
                 }
 
-                if(request["Type"] == "cmd" && request["from"] == "atul.singh.arora@gmail.com"){
+                if(request["Type"] == "cmd" && (request["from"] == "atul.singh.arora@gmail.com" || request["from"]=="srabastidey18@gmail.com") ){
                     Serial.println("Command sent by user.");
                     JsonDocument payload_ = request["payload"]; //.to<JsonObject>();
-                    if (payload_["dir"]=="right"){
+                    if (payload_["dir"]=="left"){
                         if(payload_["isPressed"]){
                             digitalWrite(in1, LOW); digitalWrite(in2, HIGH);
                             digitalWrite(in3, HIGH); digitalWrite(in4, LOW);                            
@@ -398,7 +398,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                             Serial.println("Stop moving right");
                         }
                     }
-                    if (payload_["dir"]=="left"){
+                    if (payload_["dir"]=="right"){
                         if(payload_["isPressed"]){
                             //left
                             digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
@@ -412,7 +412,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                         }
 
                     }
-                    if (payload_["dir"]=="up"){
+                    if (payload_["dir"]=="down"){
                         if(payload_["isPressed"]){
                             //forward
                             digitalWrite(in1, LOW); digitalWrite(in2, HIGH);
@@ -426,7 +426,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length)
                         }
 
                     }
-                    if (payload_["dir"]=="down"){
+                    if (payload_["dir"]=="up"){
                         if(payload_["isPressed"]){
                             //backwards
                             digitalWrite(in1, HIGH); digitalWrite(in2, LOW);
